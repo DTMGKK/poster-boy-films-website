@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Work Library — Poster Boy Films</title>
+<link rel="stylesheet" href="/pbf-system.css">
+<style>
+body { background: var(--ink); color: var(--paper); }
+
+.page-hero { background: var(--ink); min-height: 280px; }
+
+/* Showreels: 2 large */
+.reel-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+/* Trailers: 3 medium */
+.trailer-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+/* Posters: 4 across, 2 rows */
+.poster-grid-main { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+/* Logos: 4 across */
+.logo-grid-main { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+/* Podcast: list */
+.podcast-list { display: flex; flex-direction: column; gap: 0; }
+
+.reel-card { border-radius: var(--r-lg); overflow: hidden; cursor: pointer; }
+.reel-thumb {
+  aspect-ratio: 16/9; position: relative; overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+}
+.reel-scanlines { position: absolute; inset: 0;
+  background: repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,0.07) 3px,rgba(0,0,0,0.07) 4px); }
+.reel-overlay {
+  position: absolute; inset: 0; z-index: 2;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(6,6,8,0.35); transition: background 180ms;
+}
+.reel-card:hover .reel-overlay { background: rgba(6,6,8,0.1); }
+.reel-play {
+  width: 72px; height: 72px; border-radius: 50%;
+  background: rgba(255,255,255,0.13); border: 2px solid rgba(255,255,255,0.4);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 24px; color: #fff; padding-left: 5px;
+  transition: transform 200ms, background 200ms, border-color 200ms;
+}
+.reel-play-sm { width: 48px; height: 48px; font-size: 17px; }
+.reel-card:hover .reel-play { transform: scale(1.1); background: var(--pink); border-color: var(--pink); }
+.reel-runtime { position: absolute; bottom: 12px; right: 12px; z-index: 3;
+  font-family: var(--pixel); font-size: 7px; letter-spacing: 0.06em;
+  color: rgba(255,255,255,0.7); background: rgba(0,0,0,0.55); padding: 3px 7px; border-radius: 2px; }
+.reel-meta { padding: 14px 18px; }
+.reel-meta h3 { font-size: 16px; font-weight: 600; color: var(--paper); margin-bottom: 4px; }
+.reel-meta p  { font-size: 12px; color: rgba(240,234,225,0.4); }
+
+/* Logo cards */
+.logo-card-main {
+  border-radius: var(--r-md); overflow: hidden; cursor: pointer;
+  aspect-ratio: 4/3; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 10px; text-align: center; padding: 20px;
+  transition: transform 200ms;
+}
+.logo-card-main:hover { transform: translateY(-4px); }
+.logo-card-mark { font-family: var(--pixel); color: var(--gold); text-shadow: 2px 2px 0 var(--navy2); }
+.logo-card-name { font-size: 10px; color: rgba(240,234,225,0.35); font-weight: 500; letter-spacing: 0.02em; }
+.logo-card-download { font-family: var(--pixel); font-size: 7px; color: rgba(61,223,192,0.3); letter-spacing: 0.06em; margin-top: 4px; }
+
+/* Podcast episodes */
+.podcast-ep {
+  display: flex; align-items: center; gap: 20px; padding: 18px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.06); cursor: pointer;
+  transition: background 150ms; border-radius: 8px;
+}
+.podcast-ep:first-child { border-top: 1px solid rgba(255,255,255,0.06); }
+.podcast-ep:hover { background: rgba(255,255,255,0.02); }
+.ep-play-btn {
+  width: 44px; height: 44px; border-radius: 50%; flex-shrink: 0;
+  background: rgba(255,255,255,0.06); border: 1.5px solid rgba(255,255,255,0.12);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; color: var(--paper); padding-left: 3px;
+  transition: background 150ms, border-color 150ms;
+}
+.podcast-ep:hover .ep-play-btn { background: var(--pink); border-color: var(--pink); }
+.ep-meta { flex: 1; }
+.ep-num  { font-family: var(--pixel); font-size: 7px; color: var(--mint); letter-spacing: 0.07em; margin-bottom: 4px; }
+.ep-title{ font-size: 15px; font-weight: 600; color: var(--paper); margin-bottom: 3px; }
+.ep-desc { font-size: 12px; color: rgba(240,234,225,0.35); }
+.ep-time { font-family: var(--pixel); font-size: 8px; color: rgba(240,234,225,0.25); letter-spacing: 0.05em; flex-shrink: 0; }
+
+.upload-row {
+  display: flex; align-items: center; gap: 20px; padding: 18px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.upload-icon { width: 44px; height: 44px; border-radius: 50%; flex-shrink: 0;
+  border: 1.5px dashed rgba(255,255,255,0.1);
+  display: flex; align-items: center; justify-content: center; font-size: 18px; color: rgba(255,255,255,0.1); }
+.upload-label { font-family: var(--pixel); font-size: 7px; color: rgba(255,255,255,0.18); letter-spacing: 0.07em; }
+
+@media(max-width:1024px){
+  .reel-grid,.trailer-grid{grid-template-columns:1fr;}
+  .poster-grid-main,.logo-grid-main{grid-template-columns:repeat(2,1fr);}
+}
+</style>
+</head>
+<body>
+
+<nav class="pbf-nav">
+  <a href="home.html" class="nav-logo"><span>POSTER BOY FILMS</span><span class="nav-logo-sub">I R E L A N D</span></a>
+  <div class="nav-links">
+    <a href="projects.html">Projects</a>
+    <a href="catalogue.html">Catalogue</a>
+    <a href="work-library.html" class="active">Work</a>
+    <a href="adventureverse.html">Studio</a>
+    <a href="contact.html">Contact</a>
+  </div>
+  <a href="contact.html" class="nav-cta"><span class="ch">›</span><span>PRESS PLAY</span><span class="ch">‹</span></a>
+</nav>
+
+<section class="page-hero">
+  <div class="page-hero-grid"></div>
+  <div class="page-hero-fade"></div>
+  <div class="page-hero-inner pbf-inner" style="padding-top:56px">
+    <div class="sh-overline c-gold" style="margin-bottom:12px"><span>✦</span> WORK LIBRARY</div>
+    <h1 class="sh-title c-paper">The reel.</h1>
+    <p class="sh-sub" style="color:rgba(240,234,225,0.4);max-width:540px">Showreels, trailers, posters, logos and podcast episodes. Everything we've made, in one place.</p>
+  </div>
+</section>
+
+<section class="pbf-section">
+  <div class="pbf-inner">
+
+    <div class="pbf-tabs">
+      <button class="pbf-tab active" onclick="showTab('showreels')" data-tab="showreels">SHOWREELS</button>
+      <button class="pbf-tab" onclick="showTab('trailers')"  data-tab="trailers">TRAILERS</button>
+      <button class="pbf-tab" onclick="showTab('posters')"   data-tab="posters">POSTERS</button>
+      <button class="pbf-tab" onclick="showTab('logos')"     data-tab="logos">LOGOS &amp; TITLE CARDS</button>
+      <button class="pbf-tab" onclick="showTab('podcast')"   data-tab="podcast">PODCAST</button>
+    </div>
+
+    <!-- SHOWREELS -->
+    <div class="tab-pane active" id="tab-showreels">
+      <div class="reel-grid">
+        <div class="fc-d reel-card">
+          <div class="reel-thumb" style="background:linear-gradient(135deg,#0D1F35,#152E4A);min-height:300px">
+            <div class="reel-scanlines"></div>
+            <div class="reel-overlay"><div class="reel-play">▶</div></div>
+            <span class="reel-runtime">4:12</span>
+          </div>
+          <div class="reel-meta"><h3>PBF Director's Showreel 2025</h3><p>Dave Minogue · Narrative / Documentary · Full career compilation</p></div>
+        </div>
+        <div class="fc-d reel-card">
+          <div class="reel-thumb" style="background:linear-gradient(135deg,#1C0D25,#0D1F35);min-height:300px">
+            <div class="reel-scanlines"></div>
+            <div class="reel-overlay"><div class="reel-play">▶</div></div>
+            <span class="reel-runtime">2:44</span>
+          </div>
+          <div class="reel-meta"><h3>Story World Development Reel</h3><p>PBF IP · Concept art, animatics &amp; world documentation · 2025</p></div>
+        </div>
+      </div>
+      <div style="margin-top:16px">
+        <div class="fc-d" style="border-radius:var(--r-lg);padding:28px;display:flex;align-items:center;gap:16px;border-style:dashed;opacity:0.5;cursor:pointer">
+          <div style="font-size:20px;color:rgba(255,255,255,0.2)">⊕</div>
+          <div><div class="t-pixel-sm c-mint" style="margin-bottom:4px">ADD SHOWREEL</div><div class="t-body-sm c-muted">Upload a new showreel or paste a video URL</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TRAILERS -->
+    <div class="tab-pane" id="tab-trailers">
+      <div class="trailer-grid">
+        <div class="fc-d reel-card">
+          <div class="reel-thumb" style="background:linear-gradient(135deg,#0D3330,#071B2F)">
+            <div class="reel-scanlines"></div>
+            <div class="reel-overlay"><div class="reel-play reel-play-sm">▶</div></div>
+            <span class="reel-runtime">1:30</span>
+          </div>
+          <div class="reel-meta"><h3>Wing-Ed Freaks — Teaser</h3><p>Animation · Concept footage</p></div>
+        </div>
+        <div class="fc-d reel-card">
+          <div class="reel-thumb" style="background:linear-gradient(135deg,#2A1A08,#071B2F)">
+            <div class="reel-scanlines"></div>
+            <div class="reel-overlay"><div class="reel-play reel-play-sm">▶</div></div>
+            <span class="reel-runtime">2:05</span>
+          </div>
+          <div class="reel-meta"><h3>The Mighty Oak — Concept Trailer</h3><p>Film · Pitch material</p></div>
+        </div>
+        <div class="fc-d" style="border-radius:var(--r-lg);aspect-ratio:16/9;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;border:1.5px dashed rgba(255,255,255,0.08);opacity:0.5;cursor:pointer">
+          <div style="font-size:18px;color:rgba(255,255,255,0.15)">⊕</div>
+          <div class="t-pixel-sm" style="color:rgba(255,255,255,0.18)">ADD TRAILER</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- POSTERS -->
+    <div class="tab-pane" id="tab-posters">
+      <div class="poster-grid-main">
+        <div class="fc-d poster-card"><div class="poster-card-scanlines"></div><div class="poster-card-label">WEF</div><div class="poster-card-caption">The Wing-Ed Freaks</div></div>
+        <div class="fc-d poster-card" style="background:linear-gradient(160deg,#2A1A08,#071B2F)"><div class="poster-card-scanlines"></div><div class="poster-card-label">TMO</div><div class="poster-card-caption">The Mighty Oak</div></div>
+        <div class="fc-d poster-card" style="background:linear-gradient(160deg,#1A0D2A,#071B2F)"><div class="poster-card-scanlines"></div><div class="poster-card-label">ML</div><div class="poster-card-caption">Murphy's Lore</div></div>
+        <div class="fc-d poster-card" style="background:linear-gradient(160deg,#0D1F33,#1A3352)"><div class="poster-card-scanlines"></div><div class="poster-card-label">L&amp;L</div><div class="poster-card-caption">Luna &amp; Leo</div></div>
+        <div class="fc-d poster-card" style="background:linear-gradient(160deg,#2E1010,#071B2F)"><div class="poster-card-scanlines"></div><div class="poster-card-label">PB</div><div class="poster-card-caption">Poster Boys</div></div>
+        <div class="fc-d poster-card" style="background:linear-gradient(160deg,#0A2010,#071B2F)"><div class="poster-card-scanlines"></div><div class="poster-card-label" style="font-size:14px">MDH</div><div class="poster-card-caption">The Assassination…</div></div>
+        <div class="fc-d poster-card" style="background:linear-gradient(160deg,#0D2030,#04101C)"><div class="poster-card-scanlines"></div><div class="poster-card-label">UR</div><div class="poster-card-caption">Uncharted Realms</div></div>
+        <div class="fc-d poster-card" style="border:1.5px dashed rgba(255,255,255,0.08);opacity:0.45;cursor:pointer"><div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px"><div style="font-size:20px;color:rgba(255,255,255,0.12)">⊕</div><div class="t-pixel-sm" style="color:rgba(255,255,255,0.18)">ADD POSTER</div></div></div>
+      </div>
+    </div>
+
+    <!-- LOGOS -->
+    <div class="tab-pane" id="tab-logos">
+      <div class="logo-grid-main">
+        <div class="fc-d logo-card-main" style="background:rgba(255,255,255,0.03)">
+          <div class="logo-card-mark" style="font-size:10px;line-height:1.4;text-align:center">POSTER BOY<br>FILMS ✦</div>
+          <div class="logo-card-name">Primary Wordmark</div>
+          <div class="logo-card-download">↓ SVG · PNG</div>
+        </div>
+        <div class="fc-d logo-card-main" style="background:rgba(255,255,255,0.03)">
+          <div style="font-family:var(--pixel);font-size:28px;color:var(--gold);text-shadow:3px 3px 0 var(--navy2)">PBF</div>
+          <div class="logo-card-name">Monogram</div>
+          <div class="logo-card-download">↓ SVG · PNG</div>
+        </div>
+        <div class="fc-d logo-card-main" style="background:rgba(255,255,255,0.03)">
+          <div style="width:48px;height:48px;background:var(--gold);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--pink);box-shadow:3px 3px 0 var(--navy2)">▶</div>
+          <div class="logo-card-name">Icon Mark</div>
+          <div class="logo-card-download">↓ SVG · PNG</div>
+        </div>
+        <div class="fc-d logo-card-main" style="background:rgba(255,255,255,0.03)">
+          <div class="logo-card-mark" style="font-size:8px;line-height:1.5;color:var(--lav);text-shadow:none;text-align:center">ADVENTUREVERSE<br>STUDIOS ◆</div>
+          <div class="logo-card-name">Adventureverse</div>
+          <div class="logo-card-download">↓ SVG · PNG</div>
+        </div>
+        <div class="fc-d logo-card-main" style="background:rgba(255,255,255,0.03)">
+          <div class="logo-card-mark" style="font-size:9px;line-height:1.5;text-align:center">THE WING-ED<br>FREAKS</div>
+          <div class="logo-card-name">Wing-Ed Freaks Title</div>
+          <div class="logo-card-download">↓ SVG · PNG</div>
+        </div>
+        <div class="fc-d logo-card-main" style="background:rgba(255,255,255,0.03)">
+          <div class="logo-card-mark" style="font-size:8px;line-height:1.5;text-align:center;color:rgba(246,217,107,0.7)">THE MIGHTY<br>OAK</div>
+          <div class="logo-card-name">Mighty Oak Title</div>
+          <div class="logo-card-download">↓ SVG · PNG</div>
+        </div>
+        <div class="fc-d logo-card-main" style="border:1.5px dashed rgba(255,255,255,0.08);opacity:0.45;cursor:pointer;background:transparent">
+          <div style="font-size:20px;color:rgba(255,255,255,0.12)">⊕</div>
+          <div class="logo-card-name">Add logo</div>
+        </div>
+        <div class="fc-d logo-card-main" style="border:1.5px dashed rgba(255,255,255,0.08);opacity:0.45;cursor:pointer;background:transparent">
+          <div style="font-size:20px;color:rgba(255,255,255,0.12)">⊕</div>
+          <div class="logo-card-name">Add title card</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PODCAST -->
+    <div class="tab-pane" id="tab-podcast">
+      <div class="podcast-list">
+        <div class="podcast-ep">
+          <div class="ep-play-btn">▶</div>
+          <div class="ep-meta">
+            <div class="ep-num">EP 001</div>
+            <div class="ep-title">Wing-Ed Freaks Audio Drama — Episode 1: The Arrival</div>
+            <div class="ep-desc">The story begins. Someone lands somewhere they weren't supposed to be.</div>
+          </div>
+          <div class="ep-time">28:44</div>
+        </div>
+        <div class="podcast-ep">
+          <div class="ep-play-btn">▶</div>
+          <div class="ep-meta">
+            <div class="ep-num">EP 002</div>
+            <div class="ep-title">Murphy's Lore — Origin Tales: The First Thread</div>
+            <div class="ep-desc">A mythology deep-dive into the world of Murphy's Lore, before the main series.</div>
+          </div>
+          <div class="ep-time">34:12</div>
+        </div>
+        <div class="podcast-ep">
+          <div class="ep-play-btn">▶</div>
+          <div class="ep-meta">
+            <div class="ep-num">DEV DIARY 01</div>
+            <div class="ep-title">Behind the Slate — Dave Minogue on building story worlds</div>
+            <div class="ep-desc">The founder on how transmedia IP development actually works in practice.</div>
+          </div>
+          <div class="ep-time">51:06</div>
+        </div>
+        <div class="upload-row">
+          <div class="upload-icon">⊕</div>
+          <div><div class="upload-label">ADD PODCAST EPISODE</div><div class="t-caption c-muted" style="margin-top:4px">Upload audio file or paste RSS/Spotify link</div></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<footer class="pbf-footer">
+  <div><div class="footer-px">[ WORK LIBRARY ✦ ALL ASSETS CATALOGUED ]</div><div class="footer-copy">© 2026 Poster Boy Films Ltd · Ireland · hello@posterboyfilms.ie</div></div>
+  <nav class="footer-links"><a href="projects.html">Projects</a><a href="catalogue.html">Catalogue</a><a href="work-library.html">Work</a><a href="contact.html">Contact</a><a href="#">Privacy</a></nav>
+</footer>
+
+<script>
+function showTab(name) {
+  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.pbf-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  document.querySelector('[data-tab="' + name + '"]').classList.add('active');
+}
+</script>
+</body>
+</html>

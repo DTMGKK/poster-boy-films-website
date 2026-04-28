@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Wing-Ed Freaks — Poster Boy Films</title>
+<link rel="stylesheet" href="/pbf-system.css">
+<style>
+body { background: var(--navy); color: var(--paper); }
+
+/* Hero */
+.project-hero {
+  background: linear-gradient(135deg, #0D3330 0%, #071B2F 60%, #060608 100%);
+  padding: 120px 64px 80px; position: relative; overflow: hidden;
+  min-height: 500px; display: flex; align-items: flex-end;
+}
+.project-hero-grid { position: absolute; inset: 0; pointer-events: none;
+  background-image: linear-gradient(rgba(61,223,192,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(61,223,192,0.05) 1px, transparent 1px);
+  background-size: 30px 30px; }
+.project-hero-inner { position: relative; z-index: 1; max-width: 1200px; width: 100%; }
+.hero-tags { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+.project-title { font-family: var(--serif); font-size: clamp(36px, 6vw, 80px); font-weight: 700; color: var(--paper); line-height: 1.0; letter-spacing: -0.03em; margin-bottom: 20px; text-wrap: pretty; }
+.project-logline { font-size: 19px; line-height: 1.6; color: rgba(240,234,225,0.55); max-width: 600px; }
+
+/* Two-column body */
+.project-body { background: var(--ink); padding: 80px 64px; }
+.body-grid { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1fr 340px; gap: 64px; align-items: start; }
+
+/* Main content */
+.project-content { display: flex; flex-direction: column; gap: 56px; }
+.content-block h2 { font-family: var(--serif); font-size: 28px; font-weight: 600; color: var(--paper); letter-spacing: -0.015em; margin-bottom: 16px; }
+.content-block p { font-size: 16px; line-height: 1.72; color: rgba(240,234,225,0.5); margin-bottom: 12px; }
+.content-block p:last-child { margin-bottom: 0; }
+
+/* Format strategy list */
+.format-list { display: flex; flex-direction: column; gap: 0; margin-top: 16px; }
+.format-row {
+  display: grid; grid-template-columns: 44px 1fr; gap: 16px; align-items: start;
+  padding: 16px 0; border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.format-row:first-child { border-top: 1px solid rgba(255,255,255,0.06); }
+.format-icon { font-family: var(--pixel); font-size: 8px; color: var(--pink); margin-top: 3px; letter-spacing: 0.04em; }
+.format-title { font-size: 14px; font-weight: 600; color: var(--paper); margin-bottom: 3px; }
+.format-desc  { font-size: 13px; color: rgba(240,234,225,0.38); line-height: 1.5; }
+
+/* Sidebar */
+.project-sidebar { position: sticky; top: 76px; display: flex; flex-direction: column; gap: 16px; }
+.sidebar-card { border-radius: 18px; padding: 24px; }
+.sidebar-label { font-family: var(--pixel); font-size: 7px; color: var(--mint); letter-spacing: 0.08em; margin-bottom: 14px; display: block; }
+.sidebar-row { display: flex; justify-content: space-between; align-items: flex-start; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06); }
+.sidebar-row:last-child { border-bottom: none; }
+.sidebar-key { font-size: 10px; color: rgba(240,234,225,0.35); font-weight: 500; }
+.sidebar-val { font-size: 12px; color: var(--paper); font-weight: 600; text-align: right; max-width: 140px; }
+.sidebar-cta { padding-top: 16px; display: flex; flex-direction: column; gap: 10px; }
+
+/* Gallery strip */
+.project-gallery { background: var(--navy2); padding: 64px 64px; }
+.gallery-inner { max-width: 1200px; margin: 0 auto; }
+.gallery-overline { font-family: var(--pixel); font-size: 8px; color: var(--mint); letter-spacing: 0.1em; margin-bottom: 24px; display: block; }
+.gallery-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.gallery-thumb {
+  aspect-ratio: 4/3; border-radius: 12px; overflow: hidden; cursor: pointer;
+  position: relative; display: flex; align-items: center; justify-content: center;
+  transition: transform 220ms;
+}
+.gallery-thumb:hover { transform: scale(1.03); }
+.gallery-thumb-label { font-family: var(--pixel); font-size: 18px; color: rgba(255,255,255,0.1); position: relative; z-index: 1; }
+.gallery-scanlines { position: absolute; inset: 0;
+  background: repeating-linear-gradient(90deg, transparent 0, transparent 5px, rgba(0,0,0,0.12) 5px, rgba(0,0,0,0.12) 6px); }
+.gallery-upload { border: 1.5px dashed rgba(255,255,255,0.08); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; }
+.gallery-upload span { font-family: var(--pixel); font-size: 7px; color: rgba(255,255,255,0.15); letter-spacing: 0.07em; }
+
+/* Media */
+.project-media { background: var(--ink); padding: 64px 64px; }
+.media-inner { max-width: 1200px; margin: 0 auto; }
+.media-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-top: 32px; }
+
+/* Watch links */
+.watch-section { background: var(--navy); padding: 64px 64px; }
+.watch-inner { max-width: 1200px; margin: 0 auto; }
+.watch-list { display: flex; flex-direction: column; gap: 0; margin-top: 28px; }
+.watch-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 16px 0; border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.watch-row:first-child { border-top: 1px solid rgba(255,255,255,0.06); }
+.watch-platform { display: flex; align-items: center; gap: 12px; }
+.watch-platform-icon { font-family: var(--pixel); font-size: 9px; color: var(--mint); width: 48px; }
+.watch-platform-name { font-size: 15px; font-weight: 600; color: var(--paper); }
+.watch-type { font-size: 12px; color: rgba(240,234,225,0.35); }
+.watch-cta { font-size: 12px; font-weight: 600; color: var(--gold); display: flex; align-items: center; gap: 5px; transition: gap 150ms; }
+.watch-cta:hover { gap: 10px; }
+
+/* Related */
+.related { background: var(--navy2); padding: 64px 64px; }
+.related-inner { max-width: 1200px; margin: 0 auto; }
+.related-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 28px; }
+.related-card {
+  border-radius: 16px; overflow: hidden; cursor: pointer;
+  background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07);
+  transition: transform 220ms, border-color 220ms;
+}
+.related-card:hover { transform: translateY(-4px); border-color: var(--gold); }
+.related-thumb { height: 90px; display: flex; align-items: center; justify-content: center; }
+.related-meta { padding: 12px 14px; }
+.related-name { font-family: var(--serif); font-size: 16px; font-weight: 600; color: var(--paper); }
+.related-format { font-size: 11px; color: rgba(240,234,225,0.35); margin-top: 4px; }
+
+@media(max-width:1024px){
+  .project-hero { padding: 100px 28px 60px; }
+  .project-body { padding: 60px 28px; }
+  .body-grid { grid-template-columns: 1fr; gap: 48px; }
+  .project-sidebar { position: static; }
+  .project-gallery,.project-media,.watch-section,.related { padding: 56px 28px; }
+  .gallery-grid { grid-template-columns: repeat(2,1fr); }
+  .media-grid { grid-template-columns: 1fr; }
+  .related-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<nav class="pbf-nav">
+  <a href="home.html" class="nav-logo"><span>POSTER BOY FILMS</span><span class="nav-logo-sub">I R E L A N D</span></a>
+  <div class="nav-links">
+    <a href="projects.html" class="active">Projects</a>
+    <a href="catalogue.html">Catalogue</a>
+    <a href="work-library.html">Work</a>
+    <a href="adventureverse.html">Studio</a>
+    <a href="contact.html">Contact</a>
+  </div>
+  <a href="contact.html" class="nav-cta"><span class="ch">›</span><span>PRESS PLAY</span><span class="ch">‹</span></a>
+</nav>
+
+<!-- PROJECT HERO -->
+<section class="project-hero">
+  <div class="project-hero-grid"></div>
+  <div class="project-hero-inner">
+    <div class="hero-tags">
+      <span class="ptag ptag-mint">LEVEL 01</span>
+      <span class="ptag ptag-muted">ANIMATION</span>
+      <span class="ptag ptag-muted">GAME</span>
+      <span class="ptag ptag-muted">AUDIO</span>
+    </div>
+    <h1 class="project-title">The Wing-Ed<br>Freaks</h1>
+    <p class="project-logline">A character-led world for young adults who live across screens, feeds and formats — and never stay in one place. Built to be pressed play on.</p>
+  </div>
+</section>
+
+<!-- BODY -->
+<div class="project-body">
+  <div class="body-grid">
+
+    <div class="project-content">
+
+      <div class="content-block">
+        <h2>About the world</h2>
+        <p>The Wing-Ed Freaks is an original story world developed by Poster Boy Films, built from the ground up for young adult audiences who expect their entertainment to follow them across platforms. The story centres on a group of misfits navigating a world that doesn't quite fit them — and building something new in the gaps.</p>
+        <p>The world has a specific visual language, a founding mythology, and a set of characters designed for long-form development. It is not a single-format project. It is a story ecosystem.</p>
+      </div>
+
+      <div class="content-block">
+        <h2>The story</h2>
+        <p>In a world where the rules are set by people who stopped paying attention, a loose collective of misfits, makers and outliers begins to build something different. The Wing-Ed Freaks aren't trying to change the world. They're trying to live honestly inside it.</p>
+        <p>The animation series follows the core ensemble across three seasons. The game extends the world in a parallel timeline. The audio drama digs into individual characters' backstories. Each format is designed to stand alone, and to reward audiences who move between all three.</p>
+      </div>
+
+      <div class="content-block">
+        <h2>Format strategy</h2>
+        <div class="format-list">
+          <div class="format-row">
+            <div class="format-icon">01</div>
+            <div><div class="format-title">Animation Series</div><div class="format-desc">3-season arc, 10×22min per season. The primary format and anchor of the world.</div></div>
+          </div>
+          <div class="format-row">
+            <div class="format-icon">02</div>
+            <div><div class="format-title">Game</div><div class="format-desc">A narrative exploration game developed with Adventureverse Studios. Parallel story timeline, player agency built in.</div></div>
+          </div>
+          <div class="format-row">
+            <div class="format-icon">03</div>
+            <div><div class="format-title">Audio Drama</div><div class="format-desc">Character-focus episodes. Designed for podcast distribution, standalone listening, and world-depth.</div></div>
+          </div>
+          <div class="format-row">
+            <div class="format-icon">04</div>
+            <div><div class="format-title">Publishing</div><div class="format-desc">Graphic novel and companion world material, aligned with series release windows.</div></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- SIDEBAR -->
+    <div class="project-sidebar">
+      <div class="sidebar-card fc-navy">
+        <span class="sidebar-label">PROJECT STATUS</span>
+        <div class="sidebar-row"><span class="sidebar-key">Status</span><span class="sidebar-val"><span class="ptag ptag-mint">LEVEL 01</span></span></div>
+        <div class="sidebar-row"><span class="sidebar-key">Stage</span><span class="sidebar-val">Funded development</span></div>
+        <div class="sidebar-row"><span class="sidebar-key">Audience</span><span class="sidebar-val">Young adult (14–28)</span></div>
+        <div class="sidebar-row"><span class="sidebar-key">Origin</span><span class="sidebar-val">Ireland</span></div>
+        <div class="sidebar-row"><span class="sidebar-key">Formats</span><span class="sidebar-val">Animation · Game · Audio</span></div>
+        <div class="sidebar-row"><span class="sidebar-key">Partners</span><span class="sidebar-val">Seeking co-production</span></div>
+      </div>
+      <div class="sidebar-card fc-navy">
+        <span class="sidebar-label">GET INVOLVED</span>
+        <div class="sidebar-cta">
+          <a href="contact.html" class="btn-pixel" style="font-size:9px;padding:10px 18px"><span class="ch">›</span><span>REQUEST DECK</span><span class="ch">‹</span></a>
+          <a href="contact.html" class="btn-primary-light" style="justify-content:center">Contact Studio</a>
+        </div>
+      </div>
+      <div class="sidebar-card fc-navy">
+        <span class="sidebar-label">SCREEN IRELAND</span>
+        <p class="t-body-sm" style="color:rgba(240,234,225,0.4)">Development funding awarded. Additional finance sought for production. Co-production and co-finance partners welcome.</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- GALLERY -->
+<section class="project-gallery">
+  <div class="gallery-inner">
+    <span class="gallery-overline">✦ GALLERY</span>
+    <div class="gallery-grid">
+      <div class="gallery-thumb" style="background:linear-gradient(135deg,#0D3330,#152E4A)">
+        <div class="gallery-scanlines"></div><span class="gallery-thumb-label">01</span>
+      </div>
+      <div class="gallery-thumb" style="background:linear-gradient(135deg,#1A2F20,#071B2F)">
+        <div class="gallery-scanlines"></div><span class="gallery-thumb-label">02</span>
+      </div>
+      <div class="gallery-thumb" style="background:linear-gradient(135deg,#0D2030,#0D3330)">
+        <div class="gallery-scanlines"></div><span class="gallery-thumb-label">03</span>
+      </div>
+      <div class="gallery-thumb gallery-upload">
+        <span>⊕</span><span>ADD IMAGE</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MEDIA -->
+<section class="project-media">
+  <div class="media-inner">
+    <span class="gallery-overline" style="color:var(--pink)">▶ TRAILERS & MEDIA</span>
+    <div class="media-grid">
+      <div class="fc-d media-card">
+        <div class="media-card-thumb" style="background:linear-gradient(135deg,#0D3330,#071B2F)">
+          <div class="media-card-thumb-scanlines"></div>
+          <div class="media-card-overlay"><div class="play-btn">▶</div></div>
+          <span class="play-runtime">2:14</span>
+        </div>
+        <div class="media-card-meta" style="color:rgba(240,234,225,0.5)"><h4 style="color:var(--paper)">Wing-Ed Freaks — World Teaser</h4><p>Animation · Concept footage · 2025</p></div>
+      </div>
+      <div class="fc-d media-card" style="display:flex;flex-direction:column">
+        <div class="media-card-thumb" style="background:rgba(255,255,255,0.03);border:1.5px dashed rgba(255,255,255,0.08)">
+          <div class="upload-slot" style="width:100%;height:100%;border:none">
+            <div class="upload-slot-icon">⊕</div>
+            <div class="upload-slot-label">ADD TRAILER</div>
+          </div>
+        </div>
+        <div class="media-card-meta" style="color:rgba(240,234,225,0.3)"><h4 style="color:rgba(240,234,225,0.3)">Add media</h4><p>Showreel · Trailer · Pitch reel</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WATCH LINKS -->
+<section class="watch-section">
+  <div class="watch-inner">
+    <span class="gallery-overline">WATCH &amp; LISTEN</span>
+    <div class="watch-list">
+      <div class="watch-row">
+        <div class="watch-platform"><span class="watch-platform-icon">▶ TBC</span><div><div class="watch-platform-name">Streaming Platform</div><div class="watch-type">Series · All episodes</div></div></div>
+        <span class="ptag ptag-muted">COMING SOON</span>
+      </div>
+      <div class="watch-row">
+        <div class="watch-platform"><span class="watch-platform-icon">◉ POD</span><div><div class="watch-platform-name">Podcast — Audio Drama</div><div class="watch-type">Episodes · Free</div></div></div>
+        <span class="ptag ptag-muted">IN PRODUCTION</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- RELATED -->
+<section class="related">
+  <div class="related-inner">
+    <span class="gallery-overline" style="color:var(--mint)">✦ FROM THE SLATE</span>
+    <div class="related-grid">
+      <a class="related-card" href="#">
+        <div class="related-thumb" style="background:linear-gradient(135deg,#2A1A08,#071B2F)"><span style="font-family:var(--pixel);font-size:20px;color:rgba(255,255,255,0.1)">TMO</span></div>
+        <div class="related-meta"><div class="related-name">The Mighty Oak</div><div class="related-format">Film · Series</div></div>
+      </a>
+      <a class="related-card" href="#">
+        <div class="related-thumb" style="background:linear-gradient(135deg,#1A0D2A,#071B2F)"><span style="font-family:var(--pixel);font-size:20px;color:rgba(255,255,255,0.1)">ML</span></div>
+        <div class="related-meta"><div class="related-name">Murphy's Lore</div><div class="related-format">Animation · Audio</div></div>
+      </a>
+      <a class="related-card" href="#">
+        <div class="related-thumb" style="background:linear-gradient(135deg,#0D2030,#04101C)"><span style="font-family:var(--pixel);font-size:20px;color:rgba(255,255,255,0.1)">UR</span></div>
+        <div class="related-meta"><div class="related-name">Uncharted Realms</div><div class="related-format">Games · Immersive</div></div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<footer class="pbf-footer">
+  <div><div class="footer-px">[ THE WING-ED FREAKS ✦ LEVEL 01 ACTIVE ]</div><div class="footer-copy">© 2026 Poster Boy Films Ltd · Ireland · hello@posterboyfilms.ie</div></div>
+  <nav class="footer-links"><a href="projects.html">Projects</a><a href="catalogue.html">Catalogue</a><a href="work-library.html">Work</a><a href="contact.html">Contact</a><a href="#">Privacy</a></nav>
+</footer>
+</body>
+</html>

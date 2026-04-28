@@ -1,0 +1,20 @@
+heading_html: "The companies behind<br><em>the story worlds.</em>"
+subtitle: "Two studios. Connected by story, distinct in mission."
+studios:
+  - id: pbf
+    name: Poster Boy Films
+    pixel_logo_text: "POSTER BOY"
+    pixel_logo_sub: "F I L M S ✦"
+    description: "Original story IP. Features, animation, audio and immersive — rooted in Ireland, built for international audiences. Founded by writer-director Dave Minogue."
+    cta_label: "View the slate"
+    cta_link: "#slate"
+    style: gold
+
+  - id: adventureverse
+    name: Adventureverse Studios
+    pixel_logo_text: "ADVENTUREVERSE"
+    pixel_logo_sub: "S T U D I O S ◆"
+    description: "A joint venture with Elevate Pictures. Innovative interactive arm — transmedia experiences, original game IP, and animation services."
+    cta_label: "Visit studio"
+    cta_link: "https://adventurverse.studio"
+    style: lavender

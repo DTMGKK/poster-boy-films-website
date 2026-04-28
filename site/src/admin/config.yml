@@ -1,0 +1,111 @@
+backend:
+  name: git-gateway
+  branch: main
+
+media_folder: src/assets
+public_folder: /assets
+publish_mode: simple
+site_url: https://posterboyfilms.ie
+display_url: https://posterboyfilms.ie
+logo_url: /assets/PBF-Logo-Full.png
+
+collections:
+  # ─────────────────────────────────────────────
+  # SITE-WIDE COPY (hero, slate intro, contact)
+  # ─────────────────────────────────────────────
+  - name: site
+    label: Site Copy
+    description: "Hero, slate intro, contact details — affects the homepage."
+    files:
+      - file: src/_data/site.yml
+        name: site_settings
+        label: Site-wide Settings
+        fields:
+          - { name: title, label: Site Title, widget: string }
+          - { name: hero_headline_html, label: "Hero Headline (HTML allowed: <em> for italic gold)", widget: text }
+          - { name: hero_subtitle, label: Hero Subtitle, widget: text }
+          - { name: slate_heading, label: Slate Heading, widget: string }
+          - { name: slate_subtitle, label: Slate Subtitle, widget: text }
+          - { name: contact_email, label: Contact Email, widget: string }
+          - { name: location, label: Location, widget: string }
+          - { name: year, label: Copyright Year, widget: number }
+          - { name: final_cta_headline_html, label: "Final CTA Headline (HTML allowed)", widget: text }
+          - { name: final_cta_sub, label: Final CTA Subtitle, widget: string }
+
+  # ─────────────────────────────────────────────
+  # ECOSYSTEM (the two studios)
+  # ─────────────────────────────────────────────
+  - name: ecosystem
+    label: Ecosystem (Studios)
+    description: "The companies behind the story worlds — PBF and Adventureverse."
+    files:
+      - file: src/_data/ecosystem.yml
+        name: ecosystem_section
+        label: Ecosystem Section
+        fields:
+          - { name: heading_html, label: "Section Heading (HTML allowed)", widget: text }
+          - { name: subtitle, label: Subtitle, widget: string }
+          - name: studios
+            label: Studios
+            widget: list
+            summary: "{{fields.name}}"
+            fields:
+              - { name: id, label: ID (lowercase, no spaces), widget: string }
+              - { name: name, label: Studio Name, widget: string }
+              - { name: pixel_logo_text, label: Pixel Logo Text, widget: string }
+              - { name: pixel_logo_sub, label: Pixel Logo Subtitle, widget: string }
+              - { name: description, label: Description, widget: text }
+              - { name: cta_label, label: CTA Label, widget: string }
+              - { name: cta_link, label: CTA Link / URL, widget: string }
+              - { name: style, label: Logo Style, widget: select, options: ["gold", "lavender", "mint", "pink"] }
+
+  # ─────────────────────────────────────────────
+  # METHOD / FOUR LEVELS
+  # ─────────────────────────────────────────────
+  - name: method
+    label: Method (Four Levels)
+    description: "How we work — the four-level method on the homepage."
+    files:
+      - file: src/_data/method.yml
+        name: method_section
+        label: Method Section
+        fields:
+          - { name: overline, label: Overline (small text above heading), widget: string }
+          - { name: heading_html, label: "Section Heading (HTML allowed)", widget: text }
+          - name: steps
+            label: Steps
+            widget: list
+            summary: "{{fields.level}} — {{fields.title}}"
+            fields:
+              - { name: level, label: Level (e.g. LEVEL 01), widget: string }
+              - { name: title, label: Title, widget: string }
+              - { name: desc, label: Description, widget: text }
+              - { name: tag, label: Tag (small text underneath), widget: string }
+              - { name: highlight, label: Highlight this step?, widget: boolean, default: false, required: false }
+
+  # ─────────────────────────────────────────────
+  # PROJECTS (the slate)
+  # ─────────────────────────────────────────────
+  - name: projects
+    label: Projects (Slate)
+    description: "Each project on the slate. Order controls position. Hide a project by setting Visible to false."
+    folder: src/projects
+    create: true
+    delete: true
+    slug: "{{slug}}"
+    extension: md
+    format: frontmatter
+    identifier_field: title
+    summary: "{{title}} — {{status}}"
+    fields:
+      - { name: title, label: Project Title, widget: string }
+      - { name: abbreviation, label: "Abbreviation (2-4 chars, shown as cover art)", widget: string }
+      - { name: order, label: Display Order (lower = earlier), widget: number, default: 99 }
+      - { name: formats, label: "Formats (one per line)", widget: list, allow_add: true }
+      - { name: status, label: Status Badge Text, widget: string, hint: "e.g. LEVEL 01, FUNDED, ▶ PITCH READY" }
+      - { name: status_color, label: Status Badge Colour, widget: select, options: ["mint", "gold", "pink", "lav", "muted"] }
+      - { name: accent_color, label: Accent Bar Colour, widget: select, options: ["mint", "gold", "pink", "lav", "muted"] }
+      - { name: hook, label: "Hook (short logline)", widget: text }
+      - { name: gradient_start, label: "Thumbnail Gradient Start (hex)", widget: string, default: "#0D1F33" }
+      - { name: gradient_end, label: "Thumbnail Gradient End (hex)", widget: string, default: "#071B2F" }
+      - { name: visible, label: Visible on site?, widget: boolean, default: true }

@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Press Play — Poster Boy Films</title>
+<!--
+╔══════════════════════════════════════════════════════════════╗
+║  POSTER BOY FILMS — PRESS PLAY BRICK BREAKER                 ║
+║  Vanilla Canvas · No dependencies · Webflow-ready            ║
+╠══════════════════════════════════════════════════════════════╣
+║  WEBFLOW EMBEDDING                                            ║
+║                                                              ║
+║  Option A — Dedicated page (recommended):                    ║
+║    Host this file on Webflow Pages or a CDN.                 ║
+║    Link "PRESS PLAY" button to /press-play.                  ║
+║                                                              ║
+║  Option B — Iframe embed:                                    ║
+║    Host file in Webflow Assets. Add Embed element:           ║
+║    <iframe src="/press-play-game.html"                       ║
+║            style="border:none;width:100%;height:100vh"       ║
+║            title="Press Play Game — Poster Boy Films">       ║
+║    </iframe>                                                 ║
+║                                                              ║
+║  Option C — Custom Code block (self-contained):              ║
+║    Paste full file content into Webflow Custom Code.         ║
+║    Wrap in a section set to 100vw / 100vh.                   ║
+║                                                              ║
+║  ASSETS: None external. Canvas draws everything.             ║
+║  FALLBACK: <noscript> shows Watch Slate + Contact buttons.   ║
+║                                                              ║
+║  SKIP / ACCESSIBILITY:                                       ║
+║    Top-left "← SKIP GAME" link always visible.              ║
+║    Update href to your main content anchor or page.          ║
+╚══════════════════════════════════════════════════════════════╝
+
+  GAME SPEC
+  ─────────────────────────────────────────────────────────────
+  Bricks    : "POSTER / BOY / FILMS" in a 5×5 pixel font grid.
+              Custard yellow (#F6D96B), navy drop-shadow (#0E2742).
+  Ball      : Cream (#F7F4EE), radius 6px. Starts on paddle.
+  Paddle    : Custard, pink accent line on top. Mouse + touch.
+  Lives     : 3 (♥ ♥ ♥). Ball reset on each loss.
+  Win       : All bricks destroyed → mint particle burst →
+              800ms delay → "You broke the mould." overlay with:
+              [Watch the Slate] primary  [Contact Studio] secondary.
+  Lose      : 0 lives → GAME OVER overlay with [Restart] and
+              [View Slate →] escape hatch.
+  Skip      : Always-visible top-left link. Instant bypass.
+  Controls  : Mouse move / touch drag → paddle.
+              Click / tap / Space → start (when in ready state).
+  ─────────────────────────────────────────────────────────────
+-->
+<style>
+/* ── BASE ──────────────────────────────────────────────────── */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { width: 100%; height: 100%; overflow: hidden; background: #060608; }
+body { display: flex; align-items: center; justify-content: center; }
+
+/* ── CANVAS ────────────────────────────────────────────────── */
+#wrap { position: relative; width: 100vw; height: 100vh; display: flex; align-items: center; justify-content: center; }
+#c    { display: block; image-rendering: pixelated; cursor: none; }
+
+/* ── HUD LINKS ─────────────────────────────────────────────── */
+.hud-link {
+  position: fixed; z-index: 600;
+  font-family: "Courier New", Courier, monospace;
+  font-size: 9px; letter-spacing: 0.07em; text-decoration: none;
+  color: rgba(255,77,102,0.65); border: 1.5px solid rgba(255,77,102,0.3);
+  padding: 8px 14px; border-radius: 4px;
+  transition: all 180ms;
+}
+.hud-link:hover { color: #FF4D66; border-color: #FF4D66; background: rgba(255,77,102,0.07); }
+#skip-link { top: 16px; left: 16px; }
+
+/* ── LIVES ──────────────────────────────────────────────────── */
+#lives-hud {
+  position: fixed; top: 16px; right: 16px; z-index: 600;
+  font-size: 15px; letter-spacing: 0.06em;
+  color: rgba(255,77,102,0.7); user-select: none;
+  font-family: "Courier New", Courier, monospace;
+}
+
+/* ── OVERLAYS ──────────────────────────────────────────────── */
+.ov {
+  position: fixed; inset: 0; z-index: 500;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(6,6,8,0.88); backdrop-filter: blur(6px);
+}
+.ov[hidden] { display: none; }
+
+.ov-card {
+  background: rgba(11,29,48,0.97); border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 26px; padding: 52px 56px;
+  text-align: center; max-width: 440px; width: 92%;
+  display: flex; flex-direction: column; gap: 14px;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.6);
+}
+.ov-px    { font-family: "Courier New", Courier, monospace; font-size: 10px; letter-spacing: 0.12em; }
+.ov-title { font-family: Georgia, "Times New Roman", serif; font-size: 36px; font-weight: 600; color: #F7F4EE; line-height: 1.07; letter-spacing: -0.022em; }
+.ov-sub   { font-size: 14px; color: rgba(240,234,225,0.45); line-height: 1.65; }
+.ov-acts  { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
+.ov-acts a, .ov-acts button { text-decoration: none; }
+
+.btn-gold {
+  font-size: 15px; font-weight: 700; color: #0D0D0D;
+  background: #F6D96B; padding: 14px 24px; border-radius: 999px;
+  border: none; cursor: pointer; transition: background 180ms;
+}
+.btn-gold:hover { background: #FFE27A; }
+
+.btn-ghost {
+  font-size: 14px; font-weight: 500; color: rgba(240,234,225,0.6);
+  border: 1px solid rgba(255,255,255,0.14); padding: 13px 24px; border-radius: 999px;
+  background: none; cursor: pointer; transition: color 180ms, border-color 180ms;
+}
+.btn-ghost:hover { color: #F7F4EE; border-color: rgba(255,255,255,0.35); }
+
+.btn-text {
+  font-size: 12px; color: rgba(240,234,225,0.3); background: none; border: none;
+  cursor: pointer; margin-top: 4px; transition: color 180ms;
+}
+.btn-text:hover { color: rgba(240,234,225,0.65); }
+
+/* ── NOSCRIPT FALLBACK ─────────────────────────────────────── */
+.noscript-fb {
+  position: fixed; inset: 0; z-index: 9999; background: #060608;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 22px; text-align: center; padding: 48px;
+}
+.noscript-fb p { font-size: 14px; color: rgba(240,234,225,0.4); max-width: 360px; line-height: 1.65; font-family: system-ui, sans-serif; }
+.noscript-fb .nb { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+</style>
+</head>
+<body>
+
+<!-- SKIP / ACCESSIBILITY — always visible, highest priority -->
+<a href="home.html" id="skip-link" class="hud-link" aria-label="Skip game and go to Poster Boy Films home">← SKIP GAME</a>
+
+<!-- LIVES -->
+<div id="lives-hud" aria-label="Lives remaining" aria-live="polite">♥ ♥ ♥</div>
+
+<!-- CANVAS -->
+<div id="wrap" role="main">
+  <canvas id="c" aria-label="Poster Boy Films brick breaker game. Use mouse or touch to control the paddle."></canvas>
+
+  <!-- WIN ─────────────────────────────────────────────────── -->
+  <div class="ov" id="win-ov" hidden role="dialog" aria-modal="true" aria-label="Level complete">
+    <div class="ov-card">
+      <div class="ov-px" style="color:#3DDFC0">✦ &nbsp;LEVEL COMPLETE</div>
+      <div class="ov-title">You broke<br>the mould.</div>
+      <div class="ov-sub">All bricks destroyed. Ready to press play on the real thing?</div>
+      <div class="ov-acts">
+        <a href="projects.html" class="btn-gold">Watch the Slate →</a>
+        <a href="contact.html"  class="btn-ghost">Contact Studio →</a>
+      </div>
+      <button class="btn-text" id="win-replay">Play again</button>
+    </div>
+  </div>
+
+  <!-- LOSE ────────────────────────────────────────────────── -->
+  <div class="ov" id="lose-ov" hidden role="dialog" aria-modal="true" aria-label="Game over">
+    <div class="ov-card">
+      <div class="ov-px" style="color:#FF4D66">▶ &nbsp;GAME OVER</div>
+      <div class="ov-title">Try<br>again?</div>
+      <div class="ov-sub">The bricks outlasted you. Give it another shot.</div>
+      <div class="ov-acts">
+        <button class="btn-gold" id="restart-btn">RESTART</button>
+        <a href="projects.html" class="btn-ghost">View Slate →</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- NOSCRIPT FALLBACK ──────────────────────────────────────── -->
+<noscript>
+  <div class="noscript-fb">
+    <div style="font-family:'Courier New',monospace;font-size:10px;color:rgba(255,77,102,0.7);letter-spacing:0.12em">✦ POSTER BOY FILMS</div>
+    <div style="font-family:Georgia,serif;font-size:34px;font-weight:600;color:#F7F4EE;letter-spacing:-0.02em;line-height:1.1">Original story worlds.</div>
+    <p>Enable JavaScript to play. Or press play on the real thing:</p>
+    <div class="nb">
+      <a href="projects.html" style="font-size:15px;font-weight:700;color:#0D0D0D;background:#F6D96B;padding:14px 26px;border-radius:999px;text-decoration:none">Watch the Slate →</a>
+      <a href="contact.html"  style="font-size:15px;font-weight:500;color:#F7F4EE;border:1px solid rgba(255,255,255,0.2);padding:14px 26px;border-radius:999px;text-decoration:none">Contact Studio →</a>
+    </div>
+  </div>
+</noscript>
+
+<script>
+/* ============================================================
+   POSTER BOY FILMS — Press Play Brick Breaker
+   Vanilla Canvas · No dependencies
+   ============================================================ */
+(function () {
+'use strict';
+
+/* ── CONFIG ──────────────────────────────────────────────── */
+var G = {
+  W: 800, H: 520,         // logical canvas size (px)
+  BW: 10, BH: 7,          // brick width, height
+  GAP_X: 4, GAP_Y: 3,     // gap between bricks
+  CW: 14, CH: 10,         // cell size = brick + gap
+  LG: 2,                  // gap between letters (cells)
+  RG: 3,                  // gap between rows (cells)
+  START_Y: 34,            // y-offset of first brick row
+  SH: 3,                  // shadow offset (pixels)
+  BALL_R: 15,
+  BLAST_R: 160,           // explosion radius — kills nearby bricks per hit (3-hit clear)
+  SPEED: 5.4,             // ball speed (px/frame @ 60fps)
+  PAD_H: 10,
+  PAD_Y: 480,
+  LIVES: 3,
+  // colours
+  CB:  '#060608',         // background
+  CG:  'rgba(14,39,66,0.28)', // grid
+  CK:  '#F6D96B',         // custard (bricks, paddle)
+  CS:  '#0E2742',         // navy shadow
+  CBL: '#FF4D66',         // ball — press play pink
+  CA:  '#FF4D66',         // accent pink
+  CM:  '#3DDFC0',         // mint
+};
+
+/* ── PIXEL FONT  5 cols × 5 rows ─────────────────────────── */
+var F = {
+  P:[[1,1,1,0,0],[1,0,0,1,0],[1,1,1,0,0],[1,0,0,0,0],[1,0,0,0,0]],
+  O:[[0,1,1,1,0],[1,0,0,0,1],[1,0,0,0,1],[1,0,0,0,1],[0,1,1,1,0]],
+  S:[[0,1,1,1,0],[1,0,0,0,0],[0,1,1,1,0],[0,0,0,0,1],[0,1,1,1,0]],
+  T:[[1,1,1,1,1],[0,0,1,0,0],[0,0,1,0,0],[0,0,1,0,0],[0,0,1,0,0]],
+  E:[[1,1,1,1,1],[1,0,0,0,0],[1,1,1,1,0],[1,0,0,0,0],[1,1,1,1,1]],
+  R:[[1,1,1,1,0],[1,0,0,0,1],[1,1,1,1,0],[1,0,1,0,0],[1,0,0,1,0]],
+  B:[[1,1,1,1,0],[1,0,0,0,1],[1,1,1,1,0],[1,0,0,0,1],[1,1,1,1,0]],
+  Y:[[1,0,0,0,1],[0,1,0,1,0],[0,0,1,0,0],[0,0,1,0,0],[0,0,1,0,0]],
+  F:[[1,1,1,1,1],[1,0,0,0,0],[1,1,1,1,0],[1,0,0,0,0],[1,0,0,0,0]],
+  I:[[0,1,1,1,0],[0,0,1,0,0],[0,0,1,0,0],[0,0,1,0,0],[0,1,1,1,0]],
+  L:[[1,0,0,0,0],[1,0,0,0,0],[1,0,0,0,0],[1,0,0,0,0],[1,1,1,1,1]],
+  M:[[1,0,0,0,1],[1,1,0,1,1],[1,0,1,0,1],[1,0,0,0,1],[1,0,0,0,1]],
+};
+
+/* ── BUILD BRICKS ────────────────────────────────────────── */
+function buildBricks() {
+  var result = [];
+  var words = ['POSTER', 'BOY', 'FILMS'];
+  var rowY = G.START_Y;
+
+  words.forEach(function(word) {
+    var lw = 5 * G.CW;
+    var totalW = word.length * lw + (word.length - 1) * G.LG * G.CW;
+    var cx = Math.round((G.W - totalW) / 2);
+
+    word.split('').forEach(function(ch) {
+      var grid = F[ch];
+      if (grid) {
+        for (var r = 0; r < 5; r++) {
+          for (var c = 0; c < 5; c++) {
+            if (grid[r][c]) {
+              result.push({
+                x: cx + c * G.CW,
+                y: rowY + r * G.CH,
+                w: G.BW, h: G.BH,
+                alive: true
+              });
+            }
+          }
+        }
+      }
+      cx += lw + G.LG * G.CW;
+    });
+    rowY += 5 * G.CH + G.RG * G.CH;
+  });
+  return result;
+}
+
+/* ── PARTICLE ────────────────────────────────────────────── */
+function Particle(x, y, color, sz) {
+  this.x = x; this.y = y; this.color = color;
+  this.vx = (Math.random() - 0.5) * 5.5;
+  this.vy = Math.random() * -4.5 - 0.5;
+  this.life = 1;
+  this.decay = Math.random() * 0.024 + 0.012;
+  this.sz = sz || (Math.random() * 3 + 1.5);
+}
+Particle.prototype.step = function() {
+  this.x += this.vx; this.y += this.vy;
+  this.vy += 0.1; this.life -= this.decay;
+};
+Particle.prototype.draw = function(ctx) {
+  if (this.life <= 0) return;
+  ctx.save();
+  ctx.globalAlpha = Math.max(0, this.life);
+  ctx.fillStyle = this.color;
+  ctx.fillRect(this.x - this.sz / 2, this.y - this.sz / 2, this.sz, this.sz);
+  ctx.restore();
+};
+
+/* ── STATE ───────────────────────────────────────────────── */
+var canvas, ctx;
+var bricks = [], parts = [];
+var ball = {}, pad = {};
+var lives = G.LIVES;
+var state = 'ready'; // ready | playing | win | lose
+var padW;
+
+/* ── INIT ────────────────────────────────────────────────── */
+function init() {
+  canvas = document.getElementById('c');
+  ctx    = canvas.getContext('2d');
+  canvas.width  = G.W;
+  canvas.height = G.H;
+
+  bricks = buildBricks();
+  padW   = window.innerWidth < 680 ? 130 : 110;
+  pad    = { x: G.W / 2 - padW / 2, y: G.PAD_Y, w: padW, h: G.PAD_H };
+  resetBall();
+  updateLives();
+  resize();
+  bindEvents();
+  requestAnimationFrame(loop);
+}
+
+function resize() {
+  var scale = Math.min(window.innerWidth / G.W, window.innerHeight / G.H);
+  canvas.style.width  = (G.W * scale) + 'px';
+  canvas.style.height = (G.H * scale) + 'px';
+}
+
+function resetBall() {
+  ball = {
+    x: pad.x + pad.w / 2,
+    y: G.PAD_Y - G.BALL_R - 2,
+    vx: (Math.random() < 0.5 ? 1 : -1) * 2.1,
+    vy: -G.SPEED,
+    r: G.BALL_R
+  };
+}
+
+/* ── EVENTS ──────────────────────────────────────────────── */
+function bindEvents() {
+  window.addEventListener('resize', resize);
+
+  function movePad(clientX) {
+    var rect = canvas.getBoundingClientRect();
+    var mx = (clientX - rect.left) * (G.W / rect.width);
+    pad.x  = Math.max(0, Math.min(G.W - pad.w, mx - pad.w / 2));
+    if (state === 'ready') ball.x = pad.x + pad.w / 2;
+  }
+
+  canvas.addEventListener('mousemove', function(e) { movePad(e.clientX); });
+  canvas.addEventListener('touchmove', function(e) {
+    e.preventDefault(); movePad(e.touches[0].clientX);
+  }, { passive: false });
+
+  function startPlay() { if (state === 'ready') state = 'playing'; }
+  canvas.addEventListener('click', startPlay);
+  canvas.addEventListener('touchend', function(e) { e.preventDefault(); startPlay(); });
+  window.addEventListener('keydown', function(e) {
+    if (e.code === 'Space') { e.preventDefault(); startPlay(); }
+  });
+
+  document.getElementById('restart-btn').addEventListener('click', restart);
+  document.getElementById('win-replay').addEventListener('click', restart);
+}
+
+function restart() {
+  bricks = buildBricks();
+  parts  = [];
+  lives  = G.LIVES;
+  updateLives();
+  pad.x  = G.W / 2 - pad.w / 2;
+  resetBall();
+  document.getElementById('win-ov').hidden  = true;
+  document.getElementById('lose-ov').hidden = true;
+  state = 'ready';
+}
+
+/* ── LOOP ────────────────────────────────────────────────── */
+function loop() {
+  update();
+  render();
+  requestAnimationFrame(loop);
+}
+
+/* ── UPDATE ──────────────────────────────────────────────── */
+function update() {
+  // Win: spawn continuous mint sparkles behind overlay
+  if (state === 'win') {
+    if (Math.random() < 0.35) {
+      parts.push(new Particle(
+        Math.random() * G.W, Math.random() * G.H * 0.55,
+        G.CM, Math.random() * 3.5 + 2
+      ));
+    }
+    parts.forEach(function(p) { p.step(); });
+    parts = parts.filter(function(p) { return p.life > 0; });
+    return;
+  }
+
+  if (state !== 'playing') {
+    parts.forEach(function(p) { p.step(); });
+    parts = parts.filter(function(p) { return p.life > 0; });
+    return;
+  }
+
+  // Move ball
+  ball.x += ball.vx;
+  ball.y += ball.vy;
+
+  // Wall reflections
+  if (ball.x - ball.r < 0)   { ball.x = ball.r;       ball.vx =  Math.abs(ball.vx); }
+  if (ball.x + ball.r > G.W) { ball.x = G.W - ball.r; ball.vx = -Math.abs(ball.vx); }
+  if (ball.y - ball.r < 0)   { ball.y = ball.r;        ball.vy =  Math.abs(ball.vy); }
+
+  // Paddle
+  hitPaddle();
+
+  // Bricks (max one per frame prevents multi-bounce glitch)
+  for (var i = 0; i < bricks.length; i++) {
+    if (hitBrick(bricks[i])) break;
+  }
+
+  // Particles
+  parts.forEach(function(p) { p.step(); });
+  parts = parts.filter(function(p) { return p.life > 0; });
+
+  // Out of bounds
+  if (ball.y - ball.r > G.H + 20) {
+    lives--;
+    updateLives();
+    if (lives <= 0) {
+      state = 'lose';
+      document.getElementById('lose-ov').hidden = false;
+    } else {
+      resetBall();
+      state = 'ready';
+    }
+  }
+
+  // Win check
+  if (bricks.every(function(b) { return !b.alive; })) {
+    state = 'win';
+    spawnWinBurst();
+    setTimeout(function() {
+      document.getElementById('win-ov').hidden = false;
+    }, 820);
+  }
+}
+
+function hitPaddle() {
+  if (ball.y + ball.r >= pad.y &&
+      ball.y + ball.r <= pad.y + pad.h + Math.abs(ball.vy) &&
+      ball.x >= pad.x && ball.x <= pad.x + pad.w) {
+
+    var pos   = (ball.x - pad.x) / pad.w;          // 0 = left, 1 = right
+    var angle = (pos - 0.5) * Math.PI * 0.78;      // ±70° from vertical
+    var spd   = Math.max(Math.hypot(ball.vx, ball.vy), G.SPEED);
+    ball.vx   = spd * Math.sin(angle);
+    ball.vy   = -Math.abs(spd * Math.cos(angle));
+    ball.y    = pad.y - ball.r - 1;
+
+    // Custard sparks
+    for (var i = 0; i < 5; i++) {
+      parts.push(new Particle(ball.x, pad.y, G.CK, 2));
+    }
+  }
+}
+
+function hitBrick(b) {
+  if (!b.alive) return false;
+  // Expand by ball radius — check if ball centre is inside
+  var el = b.x - ball.r, er = b.x + b.w + ball.r;
+  var et = b.y - ball.r, eb = b.y + b.h + ball.r;
+  if (ball.x < el || ball.x > er || ball.y < et || ball.y > eb) return false;
+
+  // Which axis entered this frame?
+  var px = ball.x - ball.vx, py = ball.y - ball.vy;
+  var inX = px >= el && px <= er;
+  var inY = py >= et && py <= eb;
+  if (!inX) ball.vx *= -1;
+  if (!inY) ball.vy *= -1;
+  if (inX && inY) ball.vy *= -1;  // corner → prefer vertical flip
+
+  // Explosive hit — destroy nearby bricks within blast radius
+  var hitX = b.x + b.w / 2;
+  var hitY = b.y + b.h / 2;
+  var killed = 0;
+  bricks.forEach(function(other) {
+    if (!other.alive) return;
+    var ox = other.x + other.w / 2;
+    var oy = other.y + other.h / 2;
+    var d  = Math.hypot(ox - hitX, oy - hitY);
+    if (d <= G.BLAST_R) {
+      other.alive = false;
+      killed++;
+      if (killed % 2 === 0) parts.push(new Particle(ox, oy, G.CK));
+    }
+  });
+  // Hit point burst
+  for (var i = 0; i < 16; i++) parts.push(new Particle(hitX, hitY, G.CK, Math.random() * 4 + 2));
+  return true;
+}
+
+function spawnWinBurst() {
+  for (var i = 0; i < 70; i++) {
+    var p = new Particle(
+      Math.random() * G.W, Math.random() * G.H * 0.6,
+      G.CM, Math.random() * 4 + 2
+    );
+    p.vx = (Math.random() - 0.5) * 7;
+    p.vy = Math.random() * -6 - 2;
+    parts.push(p);
+  }
+}
+
+function updateLives() {
+  var el = document.getElementById('lives-hud');
+  var s = '';
+  for (var i = 0; i < G.LIVES; i++) s += (i < lives ? '♥' : '♡') + ' ';
+  el.textContent = s.trim();
+}
+
+/* ── RENDER ──────────────────────────────────────────────── */
+function render() {
+  // Background
+  ctx.fillStyle = G.CB;
+  ctx.fillRect(0, 0, G.W, G.H);
+
+  // Pixel grid
+  ctx.fillStyle = G.CG;
+  for (var gx = 0; gx <= G.W; gx += 32) ctx.fillRect(gx, 0, 1, G.H);
+  for (var gy = 0; gy <= G.H; gy += 32) ctx.fillRect(0, gy, G.W, 1);
+
+  // Bricks
+  bricks.forEach(function(b) {
+    if (!b.alive) return;
+    ctx.fillStyle = G.CS; // navy shadow
+    ctx.fillRect(b.x + G.SH, b.y + G.SH, b.w, b.h);
+    ctx.fillStyle = G.CK; // custard
+    ctx.fillRect(b.x, b.y, b.w, b.h);
+    ctx.fillStyle = 'rgba(255,255,255,0.26)'; // top + left highlight
+    ctx.fillRect(b.x, b.y, b.w, 1);
+    ctx.fillRect(b.x, b.y, 1, b.h);
+  });
+
+  // Particles
+  parts.forEach(function(p) { p.draw(ctx); });
+
+  // Paddle
+  ctx.fillStyle = G.CS;
+  ctx.fillRect(pad.x + G.SH, pad.y + G.SH, pad.w, pad.h);
+  ctx.fillStyle = G.CK;
+  ctx.fillRect(pad.x, pad.y, pad.w, pad.h);
+  ctx.fillStyle = G.CA; // pink accent on top edge
+  ctx.fillRect(pad.x, pad.y, pad.w, 2);
+
+  // Ball (hidden when lose overlay is up)
+  if (state !== 'lose') {
+    ctx.fillStyle = G.CBL;
+    ctx.beginPath();
+    ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // "Ready" hint — blink drawn directly on canvas
+  if (state === 'ready') {
+    var show = Math.floor(Date.now() / 720) % 2 === 0;
+    if (show) {
+      ctx.fillStyle = G.CK;
+      ctx.font = '600 11px "Courier New", Courier, monospace';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('CLICK \u00B7 TAP \u00B7 SPACE TO START', G.W / 2, G.PAD_Y - 28);
+    }
+  }
+}
+
+/* ── GO ──────────────────────────────────────────────────── */
+init();
+
+})();
+</script>
+</body>
+</html>

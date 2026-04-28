@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Current Slate — Poster Boy Films</title>
+<link rel="stylesheet" href="/pbf-system.css">
+<style>
+body { background: var(--navy); color: var(--paper); }
+
+.page-hero { background: var(--ink); min-height: 320px; }
+
+/* Filter bar */
+.filter-bar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 40px; }
+.filter-btn {
+  font-family: var(--pixel); font-size: 8px; letter-spacing: 0.07em;
+  padding: 8px 16px; border-radius: 4px; cursor: pointer;
+  border: 1.5px solid rgba(255,255,255,0.1); color: rgba(240,234,225,0.4);
+  background: transparent; transition: all 180ms;
+}
+.filter-btn.active { border-color: var(--mint); color: var(--mint); }
+.filter-btn:hover:not(.active) { border-color: rgba(255,255,255,0.25); color: rgba(240,234,225,0.75); }
+
+/* Project grid */
+.project-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.project-card {
+  border-radius: 20px; overflow: hidden; cursor: pointer; display: flex; flex-direction: column;
+  transition: transform 280ms cubic-bezier(0.22,1,0.36,1), box-shadow 280ms, border-color 280ms;
+  background: rgba(255,255,255,0.035);
+  border: 1px solid rgba(255,255,255,0.07);
+  box-shadow: 0 4px 24px rgba(0,0,0,0.24);
+}
+.project-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 16px 56px rgba(0,0,0,0.4), 0 0 0 1px var(--gold);
+  border-color: var(--gold);
+}
+.project-card[hidden] { display: none; }
+
+.card-thumb {
+  height: 160px; position: relative; overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.card-thumb-scanlines {
+  position: absolute; inset: 0;
+  background: repeating-linear-gradient(90deg, transparent 0, transparent 5px, rgba(0,0,0,0.1) 5px, rgba(0,0,0,0.1) 6px);
+}
+.card-thumb-abbr {
+  font-family: var(--pixel); font-size: 28px; color: rgba(255,255,255,0.1);
+  position: relative; z-index: 1; text-shadow: 4px 4px 0 rgba(0,0,0,0.25);
+}
+.card-accent { height: 4px; flex-shrink: 0; }
+
+.card-body { padding: 20px 22px 22px; flex: 1; display: flex; flex-direction: column; gap: 10px; }
+.card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+.card-formats { display: flex; gap: 5px; flex-wrap: wrap; }
+.card-format {
+  font-size: 10px; font-weight: 500; color: rgba(240,234,225,0.35);
+  background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07);
+  padding: 2px 8px; border-radius: 999px;
+}
+.card-title { font-family: var(--pixel); font-size: 14px; color: var(--gold); text-shadow: 3px 3px 0 var(--navy2); letter-spacing: 0.04em; line-height: 1.45; text-transform: uppercase; }
+.card-hook   { font-size: 13px; line-height: 1.55; color: rgba(240,234,225,0.38); flex: 1; }
+.card-meta {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+  background: rgba(0,0,0,0.25); border-radius: 10px; padding: 10px 12px;
+}
+.meta-key { font-family: var(--pixel); font-size: 6px; color: rgba(61,223,192,0.35); letter-spacing: 0.08em; margin-bottom: 3px; }
+.meta-val { font-size: 11px; font-weight: 600; color: rgba(240,234,225,0.65); }
+.card-footer {
+  display: flex; justify-content: space-between; align-items: center;
+  border-top: 1px solid rgba(255,255,255,0.06); padding-top: 12px;
+}
+.card-cta { font-size: 12px; font-weight: 600; color: var(--gold); display: flex; align-items: center; gap: 5px; transition: gap 150ms; }
+.project-card:hover .card-cta { gap: 10px; }
+
+/* CTA section */
+.projects-cta {
+  background: var(--ink); padding: 80px 64px; text-align: center;
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
+
+@media (max-width: 1024px) { .project-grid { grid-template-columns: repeat(2,1fr); } }
+@media (max-width: 600px)  { .project-grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<nav class="pbf-nav">
+  <a href="home.html" class="nav-logo"><span>POSTER BOY FILMS</span><span class="nav-logo-sub">I R E L A N D</span></a>
+  <div class="nav-links">
+    <a href="projects.html" class="active">Projects</a>
+    <a href="catalogue.html">Catalogue</a>
+    <a href="work-library.html">Work</a>
+    <a href="adventureverse.html">Studio</a>
+    <a href="contact.html">Contact</a>
+  </div>
+  <a href="contact.html" class="nav-cta"><span class="ch">›</span><span>PRESS PLAY</span><span class="ch">‹</span></a>
+</nav>
+
+<section class="page-hero">
+  <div class="page-hero-grid"></div>
+  <div class="page-hero-fade"></div>
+  <div class="page-hero-inner pbf-inner" style="padding-top:56px">
+    <div class="sh-overline c-mint" style="margin-bottom:12px"><span>▶</span> CURRENT SLATE · 2026</div>
+    <h1 class="sh-title c-paper">Seven worlds.<br>Active development.</h1>
+    <p class="sh-sub" style="color:rgba(240,234,225,0.4);max-width:540px">Film, animation, games, audio and immersive — all in active development. Each one built to move across formats.</p>
+  </div>
+</section>
+
+<section class="pbf-section" style="background:var(--navy2)">
+  <div class="pbf-inner">
+
+    <div class="filter-bar">
+      <button class="filter-btn active" onclick="filterProjects('all')" data-filter="all">ALL</button>
+      <button class="filter-btn" onclick="filterProjects('film')" data-filter="film">FILM</button>
+      <button class="filter-btn" onclick="filterProjects('animation')" data-filter="animation">ANIMATION</button>
+      <button class="filter-btn" onclick="filterProjects('games')" data-filter="games">GAMES</button>
+      <button class="filter-btn" onclick="filterProjects('audio')" data-filter="audio">AUDIO</button>
+      <button class="filter-btn" onclick="filterProjects('immersive')" data-filter="immersive">IMMERSIVE</button>
+    </div>
+
+    <div class="project-grid">
+
+      <div class="project-card" data-formats="animation games audio">
+        <div class="card-thumb" style="background:linear-gradient(135deg,#0D3330,#071B2F)">
+          <div class="card-thumb-scanlines"></div><span class="card-thumb-abbr">WEF</span>
+        </div>
+        <div class="card-accent" style="background:var(--mint)"></div>
+        <div class="card-body">
+          <div class="card-top">
+            <div class="card-formats"><span class="card-format">Animation</span><span class="card-format">Game</span><span class="card-format">Audio</span></div>
+            <span class="ptag ptag-mint">LEVEL 01</span>
+          </div>
+          <div class="card-title">The Wing-Ed Freaks</div>
+          <div class="card-hook">A character-led world for young adults who live across screens, feeds and formats — and never stay in one place.</div>
+          <div class="card-meta">
+            <div><div class="meta-key">AUDIENCE</div><div class="meta-val">Young adult</div></div>
+            <div><div class="meta-key">STAGE</div><div class="meta-val">Funded dev</div></div>
+          </div>
+          <div class="card-footer">
+            <a class="card-cta" href="project-template.html">Full dossier →</a>
+            <div class="sdot" style="background:var(--mint)"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="project-card" data-formats="film">
+        <div class="card-thumb" style="background:linear-gradient(135deg,#2A1A08,#071B2F)">
+          <div class="card-thumb-scanlines"></div><span class="card-thumb-abbr">TMO</span>
+        </div>
+        <div class="card-accent" style="background:var(--gold)"></div>
+        <div class="card-body">
+          <div class="card-top">
+            <div class="card-formats"><span class="card-format">Film</span><span class="card-format">Series</span></div>
+            <span class="ptag ptag-gold">FUNDED</span>
+          </div>
+          <div class="card-title">The Mighty Oak</div>
+          <div class="card-hook">An epic Irish story with deep roots, quiet fury and serious international ambition.</div>
+          <div class="card-meta">
+            <div><div class="meta-key">AUDIENCE</div><div class="meta-val">Adult</div></div>
+            <div><div class="meta-key">STAGE</div><div class="meta-val">In development</div></div>
+          </div>
+          <div class="card-footer">
+            <a class="card-cta" href="#">Full dossier →</a>
+            <div class="sdot" style="background:var(--gold);animation-delay:0.3s"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="project-card" data-formats="animation audio">
+        <div class="card-thumb" style="background:linear-gradient(135deg,#1A0D2A,#071B2F)">
+          <div class="card-thumb-scanlines"></div><span class="card-thumb-abbr">ML</span>
+        </div>
+        <div class="card-accent" style="background:var(--lav)"></div>
+        <div class="card-body">
+          <div class="card-top">
+            <div class="card-formats"><span class="card-format">Animation</span><span class="card-format">Audio</span></div>
+            <span class="ptag ptag-lav">EARLY DEV</span>
+          </div>
+          <div class="card-title">Murphy's Lore</div>
+          <div class="card-hook">Folklore reborn — a mythology for people who never lost the thread, rebuilt for modern audiences.</div>
+          <div class="card-meta">
+            <div><div class="meta-key">AUDIENCE</div><div class="meta-val">Adult / family</div></div>
+            <div><div class="meta-key">STAGE</div><div class="meta-val">Early dev</div></div>
+          </div>
+          <div class="card-footer">
+            <a class="card-cta" href="#">Full dossier →</a>
+            <div class="sdot" style="background:var(--lav);animation-delay:0.6s"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="project-card" data-formats="animation games">
+        <div class="card-thumb" style="background:linear-gradient(135deg,#0D1F33,#1A3352)">
+          <div class="card-thumb-scanlines"></div><span class="card-thumb-abbr">L&amp;L</span>
+        </div>
+        <div class="card-accent" style="background:rgba(240,234,225,0.3)"></div>
+        <div class="card-body">
+          <div class="card-top">
+            <div class="card-formats"><span class="card-format">Animation</span><span class="card-format">Game</span></div>
+            <span class="ptag ptag-muted">EARLY DEV</span>
+          </div>
+          <div class="card-title">Luna & Leo</div>
+          <div class="card-hook">Two unlikely heroes building a world from the inside out. A story about imagination as survival strategy.</div>
+          <div class="card-meta">
+            <div><div class="meta-key">AUDIENCE</div><div class="meta-val">Children / family</div></div>
+            <div><div class="meta-key">STAGE</div><div class="meta-val">Concept dev</div></div>
+          </div>
+          <div class="card-footer">
+            <a class="card-cta" href="#">Full dossier →</a>
+            <div class="sdot" style="background:rgba(240,234,225,0.3);animation-delay:0.9s"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="project-card" data-formats="film">
+        <div class="card-thumb" style="background:linear-gradient(135deg,#2E1010,#071B2F)">
+          <div class="card-thumb-scanlines"></div><span class="card-thumb-abbr">PB</span>
+        </div>
+        <div class="card-accent" style="background:var(--pink)"></div>
+        <div class="card-body">
+          <div class="card-top">
+            <div class="card-formats"><span class="card-format">Film</span></div>
+            <span class="ptag ptag-pink">▶ PITCH READY</span>
+          </div>
+          <div class="card-title">Poster Boys</div>
+          <div class="card-hook">A film about the people who make things happen behind the camera — and what the work costs them.</div>
+          <div class="card-meta">
+            <div><div class="meta-key">AUDIENCE</div><div class="meta-val">Adult</div></div>
+            <div><div class="meta-key">STAGE</div><div class="meta-val">Seeking finance</div></div>
+          </div>
+          <div class="card-footer">
+            <a class="card-cta" href="#">Full dossier →</a>
+            <div class="sdot" style="background:var(--pink);animation-delay:0.4s"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="project-card" data-formats="film">
+        <div class="card-thumb" style="background:linear-gradient(135deg,#0A2010,#071B2F)">
+          <div class="card-thumb-scanlines"></div><span class="card-thumb-abbr" style="font-size:16px">MDH</span>
+        </div>
+        <div class="card-accent" style="background:var(--pink)"></div>
+        <div class="card-body">
+          <div class="card-top">
+            <div class="card-formats"><span class="card-format">Film</span><span class="card-format">Satire</span></div>
+            <span class="ptag ptag-pink">▶ PITCH READY</span>
+          </div>
+          <div class="card-title">The Assassination of Michael D Higgins</div>
+          <div class="card-hook">A sharp political satire about power, legacy and the small island it all happens on.</div>
+          <div class="card-meta">
+            <div><div class="meta-key">AUDIENCE</div><div class="meta-val">Adult</div></div>
+            <div><div class="meta-key">STAGE</div><div class="meta-val">Seeking finance</div></div>
+          </div>
+          <div class="card-footer">
+            <a class="card-cta" href="#">Full dossier →</a>
+            <div class="sdot" style="background:var(--pink);animation-delay:0.7s"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="project-card" data-formats="games immersive">
+        <div class="card-thumb" style="background:linear-gradient(135deg,#0D2030,#04101C)">
+          <div class="card-thumb-scanlines"></div><span class="card-thumb-abbr">UR</span>
+        </div>
+        <div class="card-accent" style="background:var(--lav)"></div>
+        <div class="card-body">
+          <div class="card-top">
+            <div class="card-formats"><span class="card-format">Games</span><span class="card-format">Immersive</span></div>
+            <span class="ptag ptag-lav">IN DEVELOPMENT</span>
+          </div>
+          <div class="card-title">Uncharted Realms</div>
+          <div class="card-hook">A game-first IP exploring worlds that don't appear on any known map — territory for players who want to get lost.</div>
+          <div class="card-meta">
+            <div><div class="meta-key">AUDIENCE</div><div class="meta-val">Adult / teen</div></div>
+            <div><div class="meta-key">STAGE</div><div class="meta-val">Prototype dev</div></div>
+          </div>
+          <div class="card-footer">
+            <a class="card-cta" href="#">Full dossier →</a>
+            <div class="sdot" style="background:var(--lav);animation-delay:1s"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<div class="projects-cta">
+  <p class="t-pixel c-mint" style="margin-bottom:16px">✦ INTERESTED IN CO-PRODUCTION OR FINANCE?</p>
+  <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap">
+    <a href="contact.html" class="btn-pixel"><span class="ch">›</span><span>PRESS PLAY</span><span class="ch">‹</span></a>
+    <a href="contact.html" class="btn-primary-light">Request a Deck</a>
+  </div>
+</div>
+
+<footer class="pbf-footer">
+  <div><div class="footer-px">[ SLATE LOADED ✦ 7 WORLDS ACTIVE ]</div><div class="footer-copy">© 2026 Poster Boy Films Ltd · Ireland · hello@posterboyfilms.ie</div></div>
+  <nav class="footer-links"><a href="projects.html">Projects</a><a href="catalogue.html">Catalogue</a><a href="work-library.html">Work</a><a href="contact.html">Contact</a><a href="#">Privacy</a></nav>
+</footer>
+
+<script>
+function filterProjects(format) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.toggle('active', b.dataset.filter === format));
+  document.querySelectorAll('.project-card').forEach(card => {
+    const formats = card.dataset.formats || '';
+    card.hidden = format !== 'all' && !formats.includes(format);
+  });
+}
+</script>
+</body>
+</html>

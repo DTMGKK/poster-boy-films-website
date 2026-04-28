@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Catalogue — Poster Boy Films</title>
+<link rel="stylesheet" href="/pbf-system.css">
+<style>
+body { background: var(--ink); color: var(--paper); }
+
+/* ============================================================
+   CATALOGUE — pixel-forward Netflix grid
+   Each card = NES cartridge cover treatment
+   ============================================================ */
+
+.cat-hero {
+  padding: 120px 64px 64px; background: var(--ink); position: relative; overflow: hidden;
+  border-bottom: 2px solid var(--navy2);
+}
+.cat-hero-grid {
+  position: absolute; inset: 0; pointer-events: none;
+  background-image:
+    linear-gradient(rgba(14,39,66,0.45) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(14,39,66,0.45) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+.cat-hero-inner { position: relative; z-index: 1; max-width: 1200px; margin: 0 auto; }
+.cat-hero-logo {
+  max-width: 280px; width: 70%;
+  margin-bottom: 28px;
+  filter: drop-shadow(0 0 40px rgba(246,217,107,0.22));
+  display: block;
+}
+.cat-title {
+  font-family: var(--pixel); font-size: clamp(22px,4vw,40px);
+  color: var(--gold); text-shadow: 4px 4px 0 var(--navy2);
+  letter-spacing: 0.04em; line-height: 1.2; margin-bottom: 12px;
+}
+.cat-sub { font-size: 15px; color: rgba(240,234,225,0.35); margin-bottom: 0; }
+
+/* HUD-style stat strip on hero */
+.cat-hud {
+  margin-top: 20px; display: flex; gap: 24px; flex-wrap: wrap;
+  font-family: var(--pixel); font-size: 8px; letter-spacing: 0.08em;
+  color: rgba(61,223,192,0.5);
+}
+.cat-hud span { color: rgba(240,234,225,0.6); }
+.cat-hud .sep { color: rgba(255,77,102,0.4); }
+
+/* Filter bar */
+.cat-filter {
+  background: var(--navy); border-bottom: 1px solid rgba(255,255,255,0.06);
+  position: sticky; top: 56px; z-index: 100;
+  padding: 0 64px;
+}
+.cat-filter-inner { max-width: 1200px; margin: 0 auto; display: flex; gap: 0; overflow-x: auto; }
+.cat-filter-btn {
+  font-family: var(--pixel); font-size: 8px; letter-spacing: 0.07em;
+  padding: 14px 20px; cursor: pointer; border: none; background: transparent;
+  color: rgba(240,234,225,0.3); border-bottom: 2px solid transparent; margin-bottom: -1px;
+  transition: color 150ms, border-color 150ms; white-space: nowrap;
+}
+.cat-filter-btn.active { color: var(--mint); border-bottom-color: var(--pink); }
+.cat-filter-btn:hover:not(.active) { color: rgba(240,234,225,0.7); }
+
+/* Grid */
+.cat-section { padding: 48px 64px; }
+.cat-inner { max-width: 1200px; margin: 0 auto; }
+.cat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+
+/* ── CARTRIDGE CARD ───────────────────────────────────────── */
+.cat-card {
+  border-radius: 6px; overflow: hidden; cursor: pointer;
+  background: var(--navy);
+  border: 2px solid var(--navy3);
+  box-shadow:
+    0 0 0 1px rgba(0,0,0,0.4),
+    4px 4px 0 var(--navy2),
+    0 8px 24px rgba(0,0,0,0.35);
+  transition:
+    transform 220ms cubic-bezier(0.22,1,0.36,1),
+    box-shadow 220ms,
+    border-color 220ms;
+  display: flex; flex-direction: column; position: relative;
+}
+.cat-card:hover {
+  transform: translate(-2px, -8px) rotate(-0.4deg);
+  border-color: var(--gold);
+  box-shadow:
+    0 0 0 1px rgba(0,0,0,0.4),
+    6px 12px 0 var(--navy2),
+    0 16px 40px rgba(246,217,107,0.18),
+    0 0 32px rgba(246,217,107,0.12);
+}
+.cat-card[hidden] { display: none; }
+
+/* Cartridge top label strip (publisher) */
+.cat-card-pub {
+  background: var(--navy2);
+  border-bottom: 1px solid rgba(0,0,0,0.4);
+  padding: 5px 10px;
+  display: flex; justify-content: space-between; align-items: center;
+  font-family: var(--pixel); font-size: 6px; letter-spacing: 0.18em;
+  color: rgba(246,217,107,0.55);
+  text-transform: uppercase;
+}
+.cat-card-pub .pub-dot { color: var(--mint); }
+
+/* Cover art (the thumb) — title in PBF logo treatment */
+.cat-card-thumb {
+  height: 180px; position: relative; overflow: hidden;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 14px;
+  border-bottom: 3px solid var(--navy2);
+}
+/* CRT scan lines — stronger */
+.cat-card-thumb::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background:
+    repeating-linear-gradient(0deg,
+      rgba(0,0,0,0.18) 0px, rgba(0,0,0,0.18) 1px,
+      transparent 1px, transparent 3px),
+    repeating-linear-gradient(90deg,
+      rgba(255,255,255,0.02) 0, rgba(255,255,255,0.02) 1px,
+      transparent 1px, transparent 4px);
+  z-index: 2;
+}
+/* Vignette overlay */
+.cat-card-thumb::before {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(ellipse at center,
+    transparent 30%, rgba(0,0,0,0.4) 100%);
+  z-index: 1;
+}
+/* Title — full PBF logo treatment (custard + navy drop shadow) */
+.cat-thumb-abbr {
+  font-family: var(--pixel); font-size: 40px;
+  color: var(--gold); text-shadow: 4px 4px 0 var(--navy2);
+  letter-spacing: 0.04em; position: relative; z-index: 3;
+  line-height: 1; text-align: center;
+}
+.cat-thumb-abbr.sm { font-size: 28px; }
+/* Tiny stage badge inside the cover */
+.cat-thumb-stage {
+  font-family: var(--pixel); font-size: 7px; letter-spacing: 0.12em;
+  color: rgba(255,255,255,0.55); position: relative; z-index: 3;
+  text-transform: uppercase;
+  padding: 3px 8px; border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 2px;
+  background: rgba(0,0,0,0.4);
+}
+
+/* Pixel ribbon — coloured spine showing format family */
+.cat-accent {
+  height: 6px; flex-shrink: 0;
+  background: repeating-linear-gradient(90deg,
+    var(--accent, var(--mint)) 0,
+    var(--accent, var(--mint)) 4px,
+    transparent 4px, transparent 6px);
+}
+
+/* Body */
+.cat-body {
+  padding: 14px 16px 16px; flex: 1;
+  display: flex; flex-direction: column; gap: 10px;
+  background: var(--navy);
+}
+.cat-formats { display: flex; gap: 4px; flex-wrap: wrap; }
+.cat-format {
+  font-family: var(--pixel); font-size: 6px; letter-spacing: 0.08em;
+  color: rgba(246,217,107,0.65);
+  background: rgba(246,217,107,0.06);
+  border: 1px solid rgba(246,217,107,0.18);
+  padding: 3px 6px; border-radius: 2px;
+  text-transform: uppercase;
+}
+.cat-name {
+  font-family: var(--pixel); font-size: 13px;
+  color: var(--gold); text-shadow: 2px 2px 0 var(--navy2);
+  letter-spacing: 0.04em; line-height: 1.5;
+  text-transform: uppercase;
+}
+.cat-hook {
+  font-size: 12px; line-height: 1.55;
+  color: rgba(240,234,225,0.42); flex: 1;
+}
+
+/* Footer with PRESS START style CTA */
+.cat-footer {
+  display: flex; justify-content: space-between; align-items: center;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  padding-top: 10px; margin-top: 2px;
+}
+.cat-link {
+  font-family: var(--pixel); font-size: 8px; letter-spacing: 0.08em;
+  color: var(--mint); display: flex; align-items: center; gap: 6px;
+  transition: color 150ms, gap 150ms; text-transform: uppercase;
+}
+.cat-link .ch { color: var(--pink); }
+.cat-card:hover .cat-link { gap: 10px; color: var(--gold); }
+.cat-card:hover .cat-link .ch { color: var(--gold); }
+
+/* Section headings */
+.cat-section-label {
+  font-family: var(--pixel); font-size: 8px; color: var(--mint); letter-spacing: 0.1em;
+  display: flex; align-items: center; gap: 8px; margin-bottom: 24px;
+}
+.cat-section-label::before { content: '▶'; color: var(--pink); }
+.cat-section-label .count {
+  margin-left: auto; color: rgba(255,255,255,0.3);
+  font-size: 7px; letter-spacing: 0.15em;
+}
+
+@media(max-width:1024px){
+  .cat-grid{grid-template-columns:repeat(2,1fr);}
+  .cat-section,.cat-filter{padding-left:28px;padding-right:28px;}
+  .cat-hero{padding:100px 28px 56px;}
+}
+@media(max-width:600px) { .cat-grid{grid-template-columns:1fr;} }
+</style>
+</head>
+<body>
+
+<nav class="pbf-nav">
+  <a href="home.html" class="nav-logo"><span>POSTER BOY FILMS</span><span class="nav-logo-sub">I R E L A N D</span></a>
+  <div class="nav-links">
+    <a href="projects.html">Projects</a>
+    <a href="catalogue.html" class="active">Catalogue</a>
+    <a href="work-library.html">Work</a>
+    <a href="adventureverse.html">Studio</a>
+    <a href="contact.html">Contact</a>
+  </div>
+  <a href="contact.html" class="nav-cta"><span class="ch">›</span><span>PRESS PLAY</span><span class="ch">‹</span></a>
+</nav>
+
+<div class="cat-hero">
+  <div class="cat-hero-grid"></div>
+  <div class="cat-hero-inner">
+    <img src="/assets/PBF-Logo-Full.png" alt="Poster Boy Films" class="cat-hero-logo" />
+    <div class="t-pixel c-mint" style="margin-bottom:12px">✦ CATALOGUE INDEX</div>
+    <div class="cat-title">CATALOGUE<br>2020 — 2026</div>
+    <p class="cat-sub">Every world, format and project. Filter by category.</p>
+    <div class="cat-hud">
+      <span><span style="color:var(--mint)">▶</span> &nbsp;9 TITLES INDEXED</span>
+      <span class="sep">·</span>
+      <span><span style="color:var(--gold)">◆</span> &nbsp;7 IN ACTIVE DEV</span>
+      <span class="sep">·</span>
+      <span><span style="color:var(--pink)">●</span> &nbsp;3 PITCH READY</span>
+    </div>
+  </div>
+</div>
+
+<div class="cat-filter">
+  <div class="cat-filter-inner">
+    <button class="cat-filter-btn active" onclick="catFilter('all')"         data-cat="all">ALL</button>
+    <button class="cat-filter-btn"        onclick="catFilter('film')"        data-cat="film">FILM</button>
+    <button class="cat-filter-btn"        onclick="catFilter('animation')"   data-cat="animation">ANIMATION</button>
+    <button class="cat-filter-btn"        onclick="catFilter('games')"       data-cat="games">GAMES</button>
+    <button class="cat-filter-btn"        onclick="catFilter('audio')"       data-cat="audio">AUDIO</button>
+    <button class="cat-filter-btn"        onclick="catFilter('immersive')"   data-cat="immersive">IMMERSIVE</button>
+    <button class="cat-filter-btn"        onclick="catFilter('podcast')"     data-cat="podcast">PODCAST</button>
+  </div>
+</div>
+
+<div class="cat-section">
+  <div class="cat-inner">
+    <div class="cat-section-label">CURRENT SLATE — IN DEVELOPMENT <span class="count">07 / 09</span></div>
+    <div class="cat-grid">
+
+      <!-- WEF -->
+      <div class="cat-card" data-cats="animation games audio">
+        <div class="cat-card-pub"><span>POSTER BOY FILMS</span><span class="pub-dot">◆</span></div>
+        <div class="cat-card-thumb" style="background:linear-gradient(135deg,#0D3330,#071B2F)">
+          <span class="cat-thumb-abbr">WEF</span>
+          <span class="cat-thumb-stage">Level 01 / Funded Dev</span>
+        </div>
+        <div class="cat-accent" style="--accent:var(--mint)"></div>
+        <div class="cat-body">
+          <div class="cat-formats"><span class="cat-format">Animation</span><span class="cat-format">Game</span><span class="cat-format">Audio</span></div>
+          <div class="cat-name">The Wing-Ed Freaks</div>
+          <div class="cat-hook">Character-led world for young adults across all screens.</div>
+          <div class="cat-footer"><a class="cat-link" href="project-template.html"><span class="ch">›</span>Press Start</a><span class="ptag ptag-mint">LEVEL 01</span></div>
+        </div>
+      </div>
+
+      <!-- TMO -->
+      <div class="cat-card" data-cats="film">
+        <div class="cat-card-pub"><span>POSTER BOY FILMS</span><span class="pub-dot">◆</span></div>
+        <div class="cat-card-thumb" style="background:linear-gradient(135deg,#2A1A08,#071B2F)">
+          <span class="cat-thumb-abbr">TMO</span>
+          <span class="cat-thumb-stage">In Development</span>
+        </div>
+        <div class="cat-accent" style="--accent:var(--gold)"></div>
+        <div class="cat-body">
+          <div class="cat-formats"><span class="cat-format">Film</span><span class="cat-format">Series</span></div>
+          <div class="cat-name">The Mighty Oak</div>
+          <div class="cat-hook">An epic Irish story with deep roots and international ambition.</div>
+          <div class="cat-footer"><a class="cat-link" href="#"><span class="ch">›</span>Press Start</a><span class="ptag ptag-gold">FUNDED</span></div>
+        </div>
+      </div>
+
+      <!-- ML -->
+      <div class="cat-card" data-cats="animation audio podcast">
+        <div class="cat-card-pub"><span>POSTER BOY FILMS</span><span class="pub-dot">◆</span></div>
+        <div class="cat-card-thumb" style="background:linear-gradient(135deg,#1A0D2A,#071B2F)">
+          <span class="cat-thumb-abbr">ML</span>
+          <span class="cat-thumb-stage">Early Development</span>
+        </div>
+        <div class="cat-accent" style="--accent:var(--lav)"></div>
+        <div class="cat-body">
+          <div class="cat-formats"><span class="cat-format">Animation</span><span class="cat-format">Audio</span></div>
+          <div class="cat-name">Murphy's Lore</div>
+          <div class="cat-hook">Folklore reborn for modern audiences.</div>
+          <div class="cat-footer"><a class="cat-link" href="#"><span class="ch">›</span>Press Start</a><span class="ptag ptag-lav">EARLY DEV</span></div>
+        </div>
+      </div>
+
+      <!-- L&L -->
+      <div class="cat-card" data-cats="animation games">
+        <div class="cat-card-pub"><span>POSTER BOY FILMS</span><span class="pub-dot">◆</span></div>
+        <div class="cat-card-thumb" style="background:linear-gradient(135deg,#0D1F33,#1A3352)">
+          <span class="cat-thumb-abbr sm">L&amp;L</span>
+          <span class="cat-thumb-stage">Concept</span>
+        </div>
+        <div class="cat-accent" style="--accent:rgba(240,234,225,0.3)"></div>
+        <div class="cat-body">
+          <div class="cat-formats"><span class="cat-format">Animation</span><span class="cat-format">Game</span></div>
+          <div class="cat-name">Luna &amp; Leo</div>
+          <div class="cat-hook">Two unlikely heroes building a world from the inside out.</div>
+          <div class="cat-footer"><a class="cat-link" href="#"><span class="ch">›</span>Press Start</a><span class="ptag ptag-muted">CONCEPT</span></div>
+        </div>
+      </div>
+
+      <!-- PB -->
+      <div class="cat-card" data-cats="film">
+        <div class="cat-card-pub"><span>POSTER BOY FILMS</span><span class="pub-dot">◆</span></div>
+        <div class="cat-card-thumb" style="background:linear-gradient(135deg,#2E1010,#071B2F)">
+          <span class="cat-thumb-abbr">PB</span>
+          <span class="cat-thumb-stage">Pitch Ready</span>
+        </div>
+        <div class="cat-accent" style="--accent:var(--pink)"></div>
+        <div class="cat-body">
+          <div class="cat-formats"><span class="cat-format">Film</span></div>
+          <div class="cat-name">Poster Boys</div>
+          <div class="cat-hook">A film about the people who make things happen in the background.</div>
+          <div class="cat-footer"><a class="cat-link" href="#"><span class="ch">›</span>Press Start</a><span class="ptag ptag-pink">▶ PITCH</span></div>
+        </div>
+      </div>
+
+      <!-- MDH -->
+      <div class="cat-card" data-cats="film">
+        <div class="cat-card-pub"><span>POSTER BOY FILMS</span><span class="pub-dot">◆</span></div>
+        <div class="cat-card-thumb" style="background:linear-gradient(135deg,#0A2010,#071B2F)">
+          <span class="cat-thumb-abbr">MDH</span>
+          <span class="cat-thumb-stage">Pitch Ready</span>
+        </div>
+        <div class="cat-accent" style="--accent:var(--pink)"></div>
+        <div class="cat-body">
+          <div class="cat-formats"><span class="cat-format">Film</span><span class="cat-format">Satire</span></div>
+          <div class="cat-name">Assassination of Michael D</div>
+          <div class="cat-hook">Sharp political satire about power on a small island.</div>
+          <div class="cat-footer"><a class="cat-link" href="#"><span class="ch">›</span>Press Start</a><span class="ptag ptag-pink">▶ PITCH</span></div>
+        </div>
+      </div>
+
+      <!-- UR -->
+      <div class="cat-card" data-cats="games immersive">
+        <div class="cat-card-pub"><span>POSTER BOY FILMS</span><span class="pub-dot">◆</span></div>
+        <div class="cat-card-thumb" style="background:linear-gradient(135deg,#0D2030,#04101C)">
+          <span class="cat-thumb-abbr">UR</span>
+          <span class="cat-thumb-stage">Prototype Dev</span>
+        </div>
+        <div class="cat-accent" style="--accent:var(--lav)"></div>
+        <div class="cat-body">
+          <div class="cat-formats"><span class="cat-format">Games</span><span class="cat-format">Immersive</span></div>
+          <div class="cat-name">Uncharted Realms</div>
+          <div class="cat-hook">Worlds that don't appear on any known map.</div>
+          <div class="cat-footer"><a class="cat-link" href="#"><span class="ch">›</span>Press Start</a><span class="ptag ptag-lav">IN DEV</span></div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ARCHIVE -->
+    <div class="cat-section-label" style="margin-top:64px">ARCHIVE — COMPLETED WORKS <span class="count">02 / 09</span></div>
+    <div class="cat-grid">
+
+      <div class="cat-card" data-cats="film">
+        <div class="cat-card-pub"><span>POSTER BOY FILMS</span><span class="pub-dot">◆</span></div>
+        <div class="cat-card-thumb" style="background:linear-gradient(135deg,#1A1008,#060608)">
+          <span class="cat-thumb-abbr sm">FEAT</span>
+          <span class="cat-thumb-stage">Released 2024</span>
+        </div>
+        <div class="cat-accent" style="--accent:rgba(240,234,225,0.2)"></div>
+        <div class="cat-body">
+          <div class="cat-formats"><span class="cat-format">Film</span><span class="cat-format">Feature</span></div>
+          <div class="cat-name">Completed Feature</div>
+          <div class="cat-hook">Written, directed and produced by Dave Minogue. Festival circuit 2022–24.</div>
+          <div class="cat-footer"><a class="cat-link" href="#"><span class="ch">›</span>Details</a><span class="ptag ptag-muted">COMPLETE</span></div>
+        </div>
+      </div>
+
+      <div class="cat-card" data-cats="podcast audio">
+        <div class="cat-card-pub"><span>POSTER BOY FILMS</span><span class="pub-dot">◆</span></div>
+        <div class="cat-card-thumb" style="background:linear-gradient(135deg,#0D1520,#060608)">
+          <span class="cat-thumb-abbr sm">POD</span>
+          <span class="cat-thumb-stage">Archive 2020-25</span>
+        </div>
+        <div class="cat-accent" style="--accent:var(--mint)"></div>
+        <div class="cat-body">
+          <div class="cat-formats"><span class="cat-format">Podcast</span><span class="cat-format">Audio</span></div>
+          <div class="cat-name">Dev Diary Archive</div>
+          <div class="cat-hook">Behind-the-scenes studio conversations and development notes, 2020–2025.</div>
+          <div class="cat-footer"><a class="cat-link" href="work-library.html"><span class="ch">›</span>Listen</a><span class="ptag ptag-muted">ARCHIVE</span></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<footer class="pbf-footer">
+  <div><div class="footer-px">[ CATALOGUE LOADED ✦ 9 ITEMS INDEXED ]</div><div class="footer-copy">© 2026 Poster Boy Films Ltd · Ireland · hello@posterboyfilms.ie</div></div>
+  <nav class="footer-links"><a href="projects.html">Projects</a><a href="catalogue.html">Catalogue</a><a href="work-library.html">Work</a><a href="contact.html">Contact</a><a href="#">Privacy</a></nav>
+</footer>
+
+<script>
+function catFilter(cat) {
+  document.querySelectorAll('.cat-filter-btn').forEach(b => b.classList.toggle('active', b.dataset.cat === cat));
+  document.querySelectorAll('.cat-card').forEach(c => {
+    const cats = c.dataset.cats || '';
+    c.hidden = cat !== 'all' && !cats.includes(cat);
+  });
+}
+</script>
+</body>
+</html>
