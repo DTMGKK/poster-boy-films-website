@@ -3,6 +3,16 @@ module.exports = function (eleventyConfig) {
     eleventyConfig.addPassthroughCopy("src/admin");
     eleventyConfig.addPassthroughCopy("src/pbf-system.css");
     eleventyConfig.addPassthroughCopy({ "src/static-pages": "/" });
+    
+  // Inject password gate into all HTML
+  eleventyConfig.addTransform("passwordGate", function(content, outputPath) {
+    if (outputPath && outputPath.endsWith(".html")) {
+      const css = '<link rel="stylesheet" href="/assets/pbf-gate.css">';
+      const js = '<script src="/assets/pbf-gate.js" defer></script>';
+      return content.replace('</head>', css + '\n' + js + '\n</head>');
+    }
+    return content;
+  });
 
     eleventyConfig.addCollection("projects", function (collectionApi) {
           return collectionApi
