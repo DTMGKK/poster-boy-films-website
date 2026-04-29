@@ -6,8 +6,7 @@ module.exports = function (eleventyConfig) {
     
   // Inject password gate into all HTML
   eleventyConfig.addTransform("passwordGate", function(content, outputPath) {
-    if (outputPath && outputPath.endsWith(".html")) {
-      const css = '<link rel="stylesheet" href="/assets/pbf-gate.css">';
+    if (outputPath && outputPath.endsWith(".html") && !outputPath.includes("/admin")) {      const css = '<link rel="stylesheet" href="/assets/pbf-gate.css">';
       const js = '<script src="/assets/pbf-gate.js" defer></script>';
       return content.replace('</head>', css + '\n' + js + '\n</head>');
     }
