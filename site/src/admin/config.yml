@@ -2,8 +2,6 @@ backend:
   name: github
   repo: DTMGKK/poster-boy-films-website
   branch: main
-  auth_type: pkce
-  app_id: Ov23lizOqyd8YqWU4gmJ
 
 media_folder: src/assets
 public_folder: /assets
